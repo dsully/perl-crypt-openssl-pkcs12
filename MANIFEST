@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+PKCS12.pm
+PKCS12.xs
+TODO
+test.pl
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
