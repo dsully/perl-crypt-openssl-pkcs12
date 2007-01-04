@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.2   Thu Jan  4 10:21:31 PST 2007
+
+	- Use Module::Install
+	- Added tests.
+	- PKCS12 Create from JoNO
+
 0.1   Thu Jan 29 17:01:38 PST 2004
 
 	- Initial release.

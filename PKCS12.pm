@@ -5,7 +5,7 @@ use vars qw($VERSION @EXPORT_OK);
 use Exporter;
 use base qw(Exporter);
 
-$VERSION = '0.1';
+$VERSION = '0.2';
 
 @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 
@@ -31,12 +31,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
   use Crypt::OpenSSL::PKCS12;
 
+  my $pass   = "your password";
   my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('cert.p12');
 
-  print $pkcs12->certificate();
+  print $pkcs12->certificate($pass);
 
-  if ($pkcs12->mac_ok()) {
+  if ($pkcs12->mac_ok($pass)) {
 	....
+
+  $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', "friendly name");
 
 =head1 ABSTRACT
 
@@ -64,7 +67,7 @@ Dan Sully, E<lt>daniel@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 by Daniel Sully
+Copyright 2004-2007 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

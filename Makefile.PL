@@ -1,14 +1,13 @@
-use 5.00503;
-use ExtUtils::MakeMaker;
+# $Id: Makefile.PL 10 1998-12-16 23:02:45Z daniel $
 
-WriteMakefile(
-	'NAME'		=> 'Crypt::OpenSSL::PKCS12',
-	'VERSION_FROM'	=> 'PKCS12.pm',
-	'PREREQ_PM'		=> {},
-	($] >= 5.005 ?
-	(ABSTRACT_FROM => 'PKCS12.pm',
-	AUTHOR     => 'Dan Sully <daniel@cpan.org>') : ()),
-	'LIBS'		=> ['-lcrypto'],
-	'DEFINE'	=> '-DPERL5',
-	'INC'		=> '',
-);
+use inc::Module::Install;
+
+name('Crypt-OpenSSL-PKCS12');
+license('perl');
+perl_version('5.005');
+all_from('PKCS12.pm');
+
+cc_lib_links('crypto');
+
+auto_install();
+WriteAll();
