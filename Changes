@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.3   Fri Jan  5 15:36:28 PST 2007
+
+	- Add more POD & coverage.
+	- Fix META.yml
+
 0.2   Thu Jan  4 10:21:31 PST 2007
 
 	- Use Module::Install
