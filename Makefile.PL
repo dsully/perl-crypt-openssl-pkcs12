@@ -36,6 +36,10 @@ license('perl');
 perl_version('5.005');
 all_from('PKCS12.pm');
 
+test_requires 'Test::Pod::Coverage' => '1.08';
+test_requires 'Pod::Coverage' => '0.19';
+test_requires 'Test::More' => '0.47';
+
 cc_lib_links('crypto');
 
 auto_install();

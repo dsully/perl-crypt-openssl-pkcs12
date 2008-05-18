@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.5   Sun May 18 08:19:14 PDT 2008
+	- Fix pod coverage tests.
+
 0.4   Sat May 17 00:47:36 PDT 2008
 	- Stop cpansmoke from emailing me.
 
