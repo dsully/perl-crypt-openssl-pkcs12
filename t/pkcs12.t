@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use File::Spec::Functions qw(:ALL);
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
@@ -15,6 +15,10 @@ ok($pkcs12);
 my $pemcert = $pkcs12->certificate($pass);
 
 ok($pemcert);
+
+my $pemkey = $pkcs12->private_key($pass);
+
+ok($pemkey);
 
 ok($pkcs12->mac_ok($pass));
 

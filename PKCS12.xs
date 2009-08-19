@@ -33,7 +33,7 @@ void croakSSL(char* p_file, int p_line) {
 }
 
 #define CHECK_OPEN_SSL(p_result) if (!(p_result)) croakSSL(__FILE__, __LINE__);
-  
+
 EVP_PKEY* _load_pkey(SV* p_keyStringSv, EVP_PKEY*(*p_loader)(BIO*, EVP_PKEY**, pem_password_cb*, void*)) {
 
 	EVP_PKEY* pkey;
@@ -42,7 +42,7 @@ EVP_PKEY* _load_pkey(SV* p_keyStringSv, EVP_PKEY*(*p_loader)(BIO*, EVP_PKEY**, p
 	char* keyString = SvPV_nolen(p_keyStringSv);
 
 	if (!strncmp(keyString, "----", 4)) {
-		
+
 		CHECK_OPEN_SSL(stringBIO = BIO_new_mem_buf(keyString, strlen(keyString)));
 
 	} else {
@@ -67,7 +67,7 @@ X509* _load_x509(SV* p_keyStringSv, X509*(*p_loader)(BIO*, X509**, pem_password_
 	char* keyString = SvPV_nolen(p_keyStringSv);
 
 	if (!strncmp(keyString, "----", 4)) {
-		
+
 		CHECK_OPEN_SSL(stringBIO = BIO_new_mem_buf(keyString, strlen(keyString)));
 
 	} else {
@@ -150,9 +150,45 @@ static const char *ssl_error(void) {
 /* these are trimmed from their openssl/apps/pkcs12.c counterparts */
 int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen, int options, char *pempass) {
 
+	EVP_PKEY *pkey;
+	PKCS8_PRIV_KEY_INFO *p8;
 	X509 *x509;
-	
+
 	switch (M_PKCS12_bag_type(bag)) {
+
+		case NID_keyBag:
+
+			if (options & NOKEYS) return 1;
+
+			p8 = bag->value.keybag;
+
+			if (!(pkey = EVP_PKCS82PKEY (p8))) return 0;
+
+			PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
+
+			EVP_PKEY_free(pkey);
+
+			break;
+
+		case NID_pkcs8ShroudedKeyBag:
+
+			if (options & NOKEYS) return 1;
+
+			if (!(p8 = PKCS12_decrypt_skey(bag, pass, passlen)))
+				return 0;
+
+			if (!(pkey = EVP_PKCS82PKEY (p8))) {
+				PKCS8_PRIV_KEY_INFO_free(p8);
+				return 0;
+			}
+
+			PKCS8_PRIV_KEY_INFO_free(p8);
+
+			PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
+
+			EVP_PKEY_free(pkey);
+
+			break;
 
 		case NID_certBag:
 
@@ -217,7 +253,7 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
 		if (bagnid == NID_pkcs7_data) {
 
 			bags = PKCS12_unpack_p7data(p7);
-		
+
 		} else if (bagnid == NID_pkcs7_encrypted) {
 
 			bags = PKCS12_unpack_p7encdata(p7, pass, passlen);
@@ -242,7 +278,7 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
 	return 1;
 }
 
-MODULE = Crypt::OpenSSL::PKCS12		PACKAGE = Crypt::OpenSSL::PKCS12		
+MODULE = Crypt::OpenSSL::PKCS12		PACKAGE = Crypt::OpenSSL::PKCS12
 
 PROTOTYPES: DISABLE
 
@@ -295,7 +331,7 @@ new_from_string(class, string)
         SV	*string
 
 	ALIAS:
-   	new_from_file = 1     
+   	new_from_file = 1
 
 	PREINIT:
 	BIO *bio;
@@ -359,13 +395,13 @@ SV*
 mac_ok(pkcs12, pwd_SV = &PL_sv_undef)
 	Crypt::OpenSSL::PKCS12 pkcs12
 	SV *pwd_SV
-  
+
 	PREINIT:
 	char *pwd;
 
 	CODE:
 	STRLEN pwdlen;
- 
+
 	if (pwd_SV != &PL_sv_undef) {
 		pwd = SvPV(pwd_SV, pwdlen);
 	}
@@ -443,7 +479,7 @@ create(pkcs12, cert_SV, pk_SV, pass_SV, file_SV, name_SV = &PL_sv_undef)
 	if (name_SV != &PL_sv_undef) {
 		name = SvPV_nolen(name_SV);
 	}
-	
+
 	pkey = _load_pkey(pk_SV, PEM_read_bio_PrivateKey);
 	x509 = _load_x509(cert_SV, PEM_read_bio_X509);
 	p12  = PKCS12_create(pass, name, pkey, x509, NULL, 0,0,0,0,0);
@@ -452,7 +488,7 @@ create(pkcs12, cert_SV, pk_SV, pass_SV, file_SV, name_SV = &PL_sv_undef)
 		croak("Error creating PKCS#12 structure\n");
 		ERR_print_errors_fp(stderr);
 	}
-	
+
 	if (!(fp = fopen(file, "wb"))) {
 		croak("Error opening file %s\n", file);
 		ERR_print_errors_fp(stderr);
@@ -478,7 +514,7 @@ certificate(pkcs12, pwd_SV)
 	STRLEN pwdlen;
 
 	CODE:
-   	
+
 	if (pwd_SV != &PL_sv_undef) {
 		pwd = SvPV(pwd_SV, pwdlen);
 	}
@@ -487,6 +523,32 @@ certificate(pkcs12, pwd_SV)
 
 	PKCS12_unpack_authsafes(pkcs12);
 	dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), CLCERTS|NOKEYS, NULL);
+
+	RETVAL = sv_bio_final(bio);
+
+	OUTPUT:
+	RETVAL
+
+SV*
+private_key(pkcs12, pwd_SV)
+	Crypt::OpenSSL::PKCS12 pkcs12
+	SV *pwd_SV
+
+	PREINIT:
+	BIO *bio;
+	char *pwd;
+	STRLEN pwdlen;
+
+	CODE:
+
+	if (pwd_SV != &PL_sv_undef) {
+		pwd = SvPV(pwd_SV, pwdlen);
+	}
+
+	bio = sv_bio_create();
+
+	PKCS12_unpack_authsafes(pkcs12);
+	dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), NOCERTS, NULL);
 
 	RETVAL = sv_bio_final(bio);
 
