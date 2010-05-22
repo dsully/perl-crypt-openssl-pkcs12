@@ -87,31 +87,31 @@ X509* _load_x509(SV* p_keyStringSv, X509*(*p_loader)(BIO*, X509**, pem_password_
 /* stolen from OpenSSL.xs */
 long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int l, long x, long y) {
 
-        if (m == BIO_CB_WRITE) {
-                SV *sv = (SV *) BIO_get_callback_arg(bm);
-                sv_catpvn(sv, ptr, l);
-        }
+  if (m == BIO_CB_WRITE) {
+    SV *sv = (SV *) BIO_get_callback_arg(bm);
+    sv_catpvn(sv, ptr, l);
+  }
 
-        if (m == BIO_CB_PUTS) {
-                SV *sv = (SV *) BIO_get_callback_arg(bm);
-                l = strlen(ptr);
-                sv_catpvn(sv, ptr, l);
-        }
+  if (m == BIO_CB_PUTS) {
+    SV *sv = (SV *) BIO_get_callback_arg(bm);
+    l = strlen(ptr);
+    sv_catpvn(sv, ptr, l);
+  }
 
-        return l;
+  return l;
 }
 
 static BIO* sv_bio_create(void) {
 
-        SV *sv = newSVpvn("",0);
+  SV *sv = newSVpvn("",0);
 
   /* create an in-memory BIO abstraction and callbacks */
-        BIO *bio = BIO_new(BIO_s_mem());
+  BIO *bio = BIO_new(BIO_s_mem());
 
-        BIO_set_callback(bio, bio_write_cb);
-        BIO_set_callback_arg(bio, (void *)sv);
+  BIO_set_callback(bio, bio_write_cb);
+  BIO_set_callback_arg(bio, (void *)sv);
 
-        return bio;
+  return bio;
 }
 
 static SV* sv_bio_final(BIO *bio) {
@@ -285,13 +285,13 @@ PROTOTYPES: DISABLE
 BOOT:
 {
   OpenSSL_add_all_algorithms();
-        OpenSSL_add_all_ciphers();
-        OpenSSL_add_all_digests();
-        ERR_load_PKCS12_strings();
-        ERR_load_ASN1_strings();
-        ERR_load_crypto_strings();
-        ERR_load_DSA_strings();
-        ERR_load_RSA_strings();
+  OpenSSL_add_all_ciphers();
+  OpenSSL_add_all_digests();
+  ERR_load_PKCS12_strings();
+  ERR_load_ASN1_strings();
+  ERR_load_crypto_strings();
+  ERR_load_DSA_strings();
+  ERR_load_RSA_strings();
 
   HV *stash = gv_stashpvn("Crypt::OpenSSL::PKCS12", 22, TRUE);
 
@@ -318,20 +318,20 @@ new(class)
 
   CODE:
 
-    if ((RETVAL = PKCS12_new()) == NULL) {
+  if ((RETVAL = PKCS12_new()) == NULL) {
     croak("Couldn't create PKCS12_new() for class %s", (char*)class);
   }
 
   OUTPUT:
-        RETVAL
+  RETVAL
 
 Crypt::OpenSSL::PKCS12
 new_from_string(class, string)
   SV  *class
-        SV  *string
+  SV  *string
 
   ALIAS:
-     new_from_file = 1
+  new_from_file = 1
 
   PREINIT:
   BIO *bio;
@@ -342,21 +342,21 @@ new_from_string(class, string)
 
   cert = SvPV(string, len);
 
-        if (ix == 1) {
+  if (ix == 1) {
     bio = BIO_new_file(cert, "r");
-        } else {
+  } else {
     bio = BIO_new_mem_buf(cert, len);
   }
 
   if (!bio) croak("Failed to create BIO");
 
   /* this can come in any number of ways */
-        if ((RETVAL = d2i_PKCS12_bio(bio, 0)) == NULL) {
+  if ((RETVAL = d2i_PKCS12_bio(bio, 0)) == NULL) {
     BIO_free(bio);
     croak("%s: Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", class, ssl_error());
   }
 
-        BIO_free(bio);
+  BIO_free(bio);
 
   OUTPUT:
   RETVAL
@@ -406,7 +406,7 @@ mac_ok(pkcs12, pwd_SV = &PL_sv_undef)
     pwd = SvPV(pwd_SV, pwdlen);
   }
 
-   if (!(PKCS12_verify_mac(pkcs12, pwd, strlen(pwd)))) {
+  if (!(PKCS12_verify_mac(pkcs12, pwd, strlen(pwd)))) {
     croak("PKCS12_verify_mac: \n%s", ssl_error());
   }
 
