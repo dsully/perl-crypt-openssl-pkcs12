@@ -10,13 +10,13 @@ $VERSION = '0.6';
 @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 
 BOOT_XS: {
-	require DynaLoader;
+  require DynaLoader;
 
-	# DynaLoader calls dl_load_flags as a static method.
-	*dl_load_flags = DynaLoader->can('dl_load_flags');
+  # DynaLoader calls dl_load_flags as a static method.
+  *dl_load_flags = DynaLoader->can('dl_load_flags');
 
-	do {__PACKAGE__->can('bootstrap') ||
-		\&DynaLoader::bootstrap}->(__PACKAGE__,$VERSION);
+  do {__PACKAGE__->can('bootstrap') ||
+    \&DynaLoader::bootstrap}->(__PACKAGE__,$VERSION);
 }
 
 1;
@@ -38,7 +38,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   print $pkcs12->private_key($pass);
 
   if ($pkcs12->mac_ok($pass)) {
-	....
+  ....
 
   $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', "friendly name");
 
