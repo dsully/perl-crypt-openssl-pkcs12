@@ -1,7 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-0.6   --DATE--
+0.6   Thu May 10 10:44:30 PDT 2012
 	- Patch from Leonid Antonenkov to implement private key access.
+	- Misc compile fixes.
 
 0.5   Sun May 18 08:19:14 PDT 2008
 	- Fix pod coverage tests.

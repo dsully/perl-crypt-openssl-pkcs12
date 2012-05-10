@@ -19,6 +19,10 @@ BOOT_XS: {
     \&DynaLoader::bootstrap}->(__PACKAGE__,$VERSION);
 }
 
+END {
+  __PACKAGE__->__PKCS12_cleanup();
+}
+
 1;
 
 __END__
@@ -120,7 +124,7 @@ Dan Sully, E<lt>daniel@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2009 by Dan Sully
+Copyright 2004-2012 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

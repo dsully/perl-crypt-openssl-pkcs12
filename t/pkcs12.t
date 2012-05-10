@@ -8,7 +8,7 @@ BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 my $base   = 'certs';
 my $pass   = 'testing';
 
-my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file(catdir($base, 'test.p12')); 
+my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file(catdir($base, 'test.p12'));
 
 ok($pkcs12);
 
