@@ -8,6 +8,7 @@ perl_version('5.005');
 all_from('PKCS12.pm');
 
 homepage 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
+repository 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
 bugtracker 'https://github.com/dsully/perl-crypt-openssl-pkcs12/issues';
 
 test_requires 'Test::Pod::Coverage' => '1.08';
