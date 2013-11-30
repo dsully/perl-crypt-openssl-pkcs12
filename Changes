@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.7   TBD
+	- Patch from Mikołaj Zalewski to fix C90 issue on CentOS.
+
 0.6   Thu May 10 10:44:30 PDT 2012
 	- Patch from Leonid Antonenkov to implement private key access.
 	- Misc compile fixes.

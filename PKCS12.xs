@@ -282,9 +282,9 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
-  OpenSSL_add_all_algorithms();
-
-  HV *stash = gv_stashpvn("Crypt::OpenSSL::PKCS12", 22, TRUE);
+  HV *stash;
+  char *name;
+  int i;
 
   struct { char *n; I32 v; } Crypt__OpenSSL__PKCS12__const[] = {
     {"NOKEYS", NOKEYS},
@@ -295,8 +295,9 @@ BOOT:
     {Nullch,0}
   };
 
-  char *name;
-  int i;
+  OpenSSL_add_all_algorithms();
+
+  stash = gv_stashpvn("Crypt::OpenSSL::PKCS12", 22, TRUE);
 
   for (i = 0; (name = Crypt__OpenSSL__PKCS12__const[i].n); i++) {
     newCONSTSUB(stash, name, newSViv(Crypt__OpenSSL__PKCS12__const[i].v));
