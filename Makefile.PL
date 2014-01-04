@@ -17,10 +17,10 @@ test_requires 'Test::More' => '0.47';
 
 requires_external_cc();
 
+cc_lib_links('crypto');
 cc_inc_paths('/usr/include/openssl', '/usr/local/include/ssl', '/usr/local/ssl/include');
 cc_lib_paths('/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
 
-cc_lib_links('crypto');
 cc_optimize_flags('-O2 -g -Wall -Werror');
 
 auto_install();
