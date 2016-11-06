@@ -15,6 +15,12 @@
 #define CLCERTS         0x8
 #define CACERTS         0x10
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#define PKCS12_SAFEBAG_get0_p8inf(o) ((o)->value.keybag)
+#define PKCS12_SAFEBAG_get0_attr PKCS12_get_attr
+#endif
+
+
 const EVP_CIPHER *enc;
 
 /* fake our package name */
@@ -154,7 +160,11 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
   switch (M_PKCS12_bag_type(bag)) {
 
     case NID_keyBag: ;
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+      PKCS8_PRIV_KEY_INFO *cp8;
+#else
       const PKCS8_PRIV_KEY_INFO *cp8;
+#endif
 
       if (options & NOKEYS) return 1;
 
