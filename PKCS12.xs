@@ -379,6 +379,9 @@ __PKCS12_cleanup(void)
 
   CRYPTO_cleanup_all_ex_data();
   ERR_free_strings();
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+  ERR_remove_state(0);
+#endif
   EVP_cleanup();
 
 SV*
