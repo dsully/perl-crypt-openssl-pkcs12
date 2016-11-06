@@ -149,18 +149,18 @@ static const char *ssl_error(void) {
 int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen, int options, char *pempass) {
 
   EVP_PKEY *pkey;
-  PKCS8_PRIV_KEY_INFO *p8;
   X509 *x509;
 
   switch (M_PKCS12_bag_type(bag)) {
 
-    case NID_keyBag:
+    case NID_keyBag: ;
+      const PKCS8_PRIV_KEY_INFO *cp8;
 
       if (options & NOKEYS) return 1;
 
-      p8 = bag->value.keybag;
+      cp8 = PKCS12_SAFEBAG_get0_p8inf(bag);
 
-      if (!(pkey = EVP_PKCS82PKEY (p8))) return 0;
+      if (!(pkey = EVP_PKCS82PKEY (cp8))) return 0;
 
       PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
 
@@ -168,7 +168,8 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       break;
 
-    case NID_pkcs8ShroudedKeyBag:
+    case NID_pkcs8ShroudedKeyBag: ;
+      PKCS8_PRIV_KEY_INFO *p8;
 
       if (options & NOKEYS) return 1;
 
@@ -192,7 +193,7 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (options & NOCERTS) return 1;
 
-      if (PKCS12_get_attr(bag, NID_localKeyID)) {
+      if (PKCS12_SAFEBAG_get0_attr(bag, NID_localKeyID)) {
 
         if (options & CACERTS) return 1;
 
@@ -203,7 +204,7 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (M_PKCS12_cert_bag_type(bag) != NID_x509Certificate) return 1;
 
-      if (!(x509 = M_PKCS12_certbag2x509(bag))) return 0;
+      if (!(x509 = PKCS12_certbag2x509(bag))) return 0;
 
       PEM_write_bio_X509 (bio, x509);
 
@@ -368,7 +369,6 @@ __PKCS12_cleanup(void)
 
   CRYPTO_cleanup_all_ex_data();
   ERR_free_strings();
-  ERR_remove_state(0);
   EVP_cleanup();
 
 SV*
