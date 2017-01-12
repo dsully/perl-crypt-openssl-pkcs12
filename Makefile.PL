@@ -2,6 +2,8 @@
 
 use inc::Module::Install;
 
+use Config;
+
 name('Crypt-OpenSSL-PKCS12');
 license('perl');
 perl_version('5.005');
@@ -21,7 +23,12 @@ cc_inc_paths('/usr/include/openssl', '/usr/local/include/ssl', '/usr/local/ssl/i
 cc_lib_paths('/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
 
 cc_lib_links('crypto');
-cc_optimize_flags('-O2 -g -Wall -Werror');
+
+if ($Config::Config{myuname} =~ /darwin/i) {
+  cc_optimize_flags('-O2 -g -Wall -Werror -Wno-error=pointer-bool-conversion');
+} else {
+  cc_optimize_flags('-O2 -g -Wall -Werror');
+}
 
 auto_install();
 WriteAll();
