@@ -23,13 +23,7 @@ cc_inc_paths('/usr/local/opt/openssl/include', '/usr/include/openssl', '/usr/loc
 cc_lib_paths('/usr/local/opt/openssl/lib', '/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
 
 cc_lib_links('crypto');
-
-if ($Config::Config{myuname} =~ /darwin/i) {
-  #cc_optimize_flags('-O2 -g -Wall -Werror -Wno-error=pointer-bool-conversion');
-  cc_optimize_flags('-O2 -g -Wall -Werror');
-} else {
-  cc_optimize_flags('-O2 -g -Wall -Werror');
-}
+cc_optimize_flags('-O2 -g -Wall -Werror');
 
 auto_install();
 WriteAll();
