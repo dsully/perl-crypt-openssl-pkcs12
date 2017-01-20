@@ -14,6 +14,7 @@ inc/Module/Install.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Compiler.pm
+inc/Module/Install/External.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Include.pm
