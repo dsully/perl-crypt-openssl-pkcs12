@@ -2,7 +2,6 @@ certs/test-cert.pem
 certs/test-key.pem
 certs/test.p12
 Changes
-Crypt-OpenSSL-PKCS12-0.9.tar.gz
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm

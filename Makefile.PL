@@ -23,7 +23,13 @@ cc_inc_paths('/usr/local/opt/openssl/include', '/usr/include/openssl', '/usr/loc
 cc_lib_paths('/usr/local/opt/openssl/lib', '/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
 
 cc_lib_links('crypto');
-cc_optimize_flags('-O2 -g -Wall -Werror');
+
+if ($^O ne 'darwin') {
+    cc_optimize_flags('-O2 -g -Wall -Werror');
+}
+else {
+    cc_optimize_flags('-O2 -g -Wall -Werror -Wno-deprecated-declarations');
+}
 
 auto_install();
 WriteAll();
