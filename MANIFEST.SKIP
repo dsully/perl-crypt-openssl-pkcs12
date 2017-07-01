@@ -1,0 +1,3 @@
+\B\.git\b
+\B\.gitignore
+\.tar\.gz
