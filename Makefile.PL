@@ -19,10 +19,8 @@ test_requires 'Test::More' => '0.47';
 
 requires_external_cc();
 
-cc_inc_paths('/usr/local/opt/openssl/include', '/usr/include/openssl', '/usr/local/include/ssl', '/usr/local/ssl/include');
-cc_lib_paths('/usr/local/opt/openssl/lib', '/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
-
-cc_lib_links('crypto');
+inc '-I/usr/local/opt/openssl/include -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
+libs '-L/usr/local/opt/openssl/lib -L/usr/lib -L/usr/local/lib -L/usr/local/ssl/lib -lcrypto -lssl';
 
 if ($^O ne 'darwin') {
     cc_optimize_flags('-O2 -g -Wall -Werror');
