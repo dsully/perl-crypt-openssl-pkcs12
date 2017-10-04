@@ -2,6 +2,11 @@
 
 sudo: enabled
 
+# REF: https://docs.travis-ci.com/user/environment-variables/
+
+env:
+  - PERL_MM_USE_DEFAULT: 1
+
 # REF: https://docs.travis-ci.com/user/languages/perl/
 
 language: perl
