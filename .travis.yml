@@ -23,6 +23,3 @@ before_install:
     - sudo apt-get install -y libssl-dev
     - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
     - source ~/travis-perl-helpers/init --auto
-
-install:
-  - cpan-install --deps       # installs prereqs, including recommends
