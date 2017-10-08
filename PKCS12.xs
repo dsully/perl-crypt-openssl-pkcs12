@@ -156,11 +156,11 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
   EVP_PKEY *pkey;
   X509 *x509;
+  PKCS8_PRIV_KEY_INFO *cp8;
 
   switch (M_PKCS12_bag_type(bag)) {
 
     case NID_keyBag: ;
-      PKCS8_PRIV_KEY_INFO *cp8;
 
       if (options & NOKEYS) return 1;
 
