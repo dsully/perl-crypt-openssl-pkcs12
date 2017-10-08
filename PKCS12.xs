@@ -156,7 +156,7 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
   EVP_PKEY *pkey;
   X509 *x509;
-  PKCS8_PRIV_KEY_INFO *cp8;
+  PKCS8_PRIV_KEY_INFO *p8;
 
   switch (M_PKCS12_bag_type(bag)) {
 
@@ -164,9 +164,9 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (options & NOKEYS) return 1;
 
-      cp8 = PKCS12_SAFEBAG_get0_p8inf(bag);
+      p8 = PKCS12_SAFEBAG_get0_p8inf(bag);
 
-      if (!(pkey = EVP_PKCS82PKEY (cp8))) return 0;
+      if (!(pkey = EVP_PKCS82PKEY (p8))) return 0;
 
       PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
 
@@ -175,7 +175,6 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
       break;
 
     case NID_pkcs8ShroudedKeyBag: ;
-      PKCS8_PRIV_KEY_INFO *p8;
 
       if (options & NOKEYS) return 1;
 
