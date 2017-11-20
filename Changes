@@ -1,6 +1,6 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-0.8   Sun Nov 12 20:41:47 CET 2017
+0.8   Sun Nov 20 19:21:47 CET 2017
 
     - Patch from jonasbn improving handling of C include paths
 
