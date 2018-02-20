@@ -458,13 +458,13 @@ create(pkcs12, cert = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificat
   p12  = PKCS12_create(pass, name, pkey, x509, NULL, 0,0,0,0,0);
 
   if (!p12) {
-    croak("Error creating PKCS#12 structure\n");
     ERR_print_errors_fp(stderr);
+    croak("Error creating PKCS#12 structure\n");
   }
 
   if (!(fp = fopen(file, "wb"))) {
-    croak("Error opening file %s\n", file);
     ERR_print_errors_fp(stderr);
+    croak("Error opening file %s\n", file);
   }
 
   i2d_PKCS12_fp(fp, p12);
