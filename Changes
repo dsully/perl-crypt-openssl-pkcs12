@@ -11,7 +11,7 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
     - Patch from jonasbn reinitializing inc/ and Module::Install integration
 
-    - Patch from Songmu adjusting use of paths and flags in Makeilfe.PL
+    - Patch from Songmu adjusting use of paths and flags in Makefile.PL
 
     - Patch from jonasbn adding inc/Module/Install/External.pm from Module::Install
       missing from MANIFEST
