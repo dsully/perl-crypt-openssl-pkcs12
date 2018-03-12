@@ -11,3 +11,4 @@ inc/
 *.gz
 local
 MANIFEST.bak
+MANIFEST
