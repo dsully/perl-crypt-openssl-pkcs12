@@ -88,6 +88,42 @@ X509* _load_x509(char* keyString, X509*(*p_loader)(BIO*, X509**, pem_password_cb
   return x509;
 }
 
+STACK_OF(X509)* _load_ca(char* keyString, STACK_OF(X509_INFO)*(*p_loader)(BIO*, STACK_OF(X509_INFO)*, pem_password_cb*, void*)) {
+  int i;
+  STACK_OF(X509_INFO) *xis = NULL;
+  X509_INFO *xi = NULL;
+  BIO* stringBIO;
+  STACK_OF(X509) *ca = sk_X509_new_null();
+
+  if (!strncmp(keyString, "----", 4)) {
+
+    CHECK_OPEN_SSL(stringBIO = BIO_new_mem_buf(keyString, strlen(keyString)));
+
+  } else {
+
+    CHECK_OPEN_SSL(stringBIO = BIO_new_file(keyString, "r"));
+  }
+
+  xis = p_loader(stringBIO, NULL, NULL, NULL);
+  for (i = 1; i < sk_X509_INFO_num(xis); i++) {
+    xi = sk_X509_INFO_value(xis, i);
+    if (xi->x509 != NULL && ca != NULL) {
+      CHECK_OPEN_SSL(xi->x509);
+      if (!sk_X509_push(ca, xi->x509))
+        goto end;
+      xi->x509 = NULL;
+    }
+  }
+
+ end:
+
+  sk_X509_INFO_pop_free(xis, X509_INFO_free);
+  (void)BIO_set_close(stringBIO, BIO_CLOSE);
+  BIO_free_all(stringBIO);
+
+  return ca;
+}
+
 /* stolen from OpenSSL.xs */
 long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int l, long x, long y) {
 
@@ -450,12 +486,14 @@ create(pkcs12, cert = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificat
   EVP_PKEY* pkey;
   X509* x509;
   PKCS12 *p12;
+  STACK_OF(X509) *ca = NULL;
 
   CODE:
 
   pkey = _load_pkey(pk, PEM_read_bio_PrivateKey);
   x509 = _load_x509(cert, PEM_read_bio_X509);
-  p12  = PKCS12_create(pass, name, pkey, x509, NULL, 0,0,0,0,0);
+  ca   = _load_ca(cert, PEM_X509_INFO_read_bio);
+  p12  = PKCS12_create(pass, name, pkey, x509, ca, 0, 0, 0, 0, 0);
 
   if (!p12) {
     ERR_print_errors_fp(stderr);
