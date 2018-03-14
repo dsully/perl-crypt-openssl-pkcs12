@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.10  Wed Mar 14 08:11:54 CET 2018
+
+- Patch from kelson (@kelson42) improving the code, going from two pass to one
+  pass, speeding up the chain management PR #27
+
 0.9   Sun Mar 11 19:45:18 CET 2018
 
     - Patch from kelson (@kelson42) addressing compilation issues against OpenSSL 1.1.0
