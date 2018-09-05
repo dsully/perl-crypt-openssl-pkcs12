@@ -1,13 +1,12 @@
 package Crypt::OpenSSL::PKCS12;
 
 use strict;
-use vars qw($VERSION @EXPORT_OK);
 use Exporter;
-use base qw(Exporter);
 
 $VERSION = '1.1';
+our @ISA = qw(Exporter);
 
-@EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
+our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 
 use XSLoader;
 
