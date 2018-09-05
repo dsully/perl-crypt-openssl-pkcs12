@@ -1,5 +1,6 @@
 # $Id: Makefile.PL 10 1998-12-16 23:02:45Z daniel $
 
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 use inc::Module::Install;
 
 use Config;
