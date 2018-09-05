@@ -9,15 +9,9 @@ $VERSION = '1.0';
 
 @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 
-BOOT_XS: {
-  require DynaLoader;
+use XSLoader;
 
-  # DynaLoader calls dl_load_flags as a static method.
-  *dl_load_flags = DynaLoader->can('dl_load_flags');
-
-  do {__PACKAGE__->can('bootstrap') ||
-    \&DynaLoader::bootstrap}->(__PACKAGE__,$VERSION);
-}
+XSLoader::load 'Crypt::OpenSSL::PKCS12', $VERSION;
 
 END {
   __PACKAGE__->__PKCS12_cleanup();
