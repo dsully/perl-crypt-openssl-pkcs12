@@ -12,3 +12,4 @@ inc/
 local
 MANIFEST.bak
 MANIFEST
+.vstags
