@@ -16,7 +16,8 @@ perl:
   - "5.10"
   - "5.8"
 
-# http://blogs.perl.org/users/graham_knop/2014/10/travis-ci-perl-helpers.html
+# REF: http://blogs.perl.org/users/graham_knop/2014/10/travis-ci-perl-helpers.html
+# REF: https://github.com/travis-perl/helpers
 
 before_install:
     - sudo apt-get update -q
