@@ -6,6 +6,7 @@
 \.bak
 .travis.yml
 ^Makefile$
+Makefile.old
 blib/
 PKCS12.bs
 PKCS12.c
