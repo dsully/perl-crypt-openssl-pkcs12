@@ -2,6 +2,7 @@ META.yml
 MYMETA.json
 MYMETA.yml
 Makefile
+Makefile.old
 PKCS12.bs
 PKCS12.c
 PKCS12.o
