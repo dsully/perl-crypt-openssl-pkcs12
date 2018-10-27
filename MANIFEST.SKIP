@@ -13,3 +13,4 @@ PKCS12.c
 PKCS12.o
 pm_to_blib
 .vstags
+MYMETA.*
