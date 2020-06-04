@@ -8,7 +8,6 @@ PKCS12.c
 PKCS12.o
 blib/
 pm_to_blib
-inc/
 *.gz
 local
 MANIFEST.bak
