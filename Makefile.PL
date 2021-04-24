@@ -18,6 +18,7 @@ bugtracker 'https://github.com/dsully/perl-crypt-openssl-pkcs12/issues';
 test_requires 'Test::Pod::Coverage' => '1.08';
 test_requires 'Pod::Coverage' => '0.19';
 test_requires 'Test::More' => '0.47';
+test_requires 'File::Spec::Functions' => '0'; # in core
 
 requires_external_cc();
 

@@ -1,5 +1,6 @@
 package Crypt::OpenSSL::PKCS12;
 
+use warnings;
 use strict;
 use Exporter;
 
