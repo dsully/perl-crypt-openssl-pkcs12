@@ -21,9 +21,11 @@ END {
 
 __END__
 
+=pod
+
 =head1 NAME
 
-Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
+Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API
 
 =head1 SYNOPSIS
 

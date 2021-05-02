@@ -2,14 +2,13 @@
 
 use warnings;
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
-use Env;
+use FindBin;
+use lib qw($FindBin::Bin/../lib $FindBin::Bin/lib lib ../lib);
 
-print STDERR Dumper %ENV{TEST_VERBOSE};
-
-BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
+use Crypt::OpenSSL::PKCS12;
 
 my $base   = 'certs';
 my $pass   = 'testing';

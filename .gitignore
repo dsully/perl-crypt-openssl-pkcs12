@@ -13,3 +13,5 @@ local
 MANIFEST.bak
 MANIFEST
 .vstags
+.build
+Crypt-OpenSSL-PKCS12-*

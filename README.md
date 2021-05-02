@@ -1,0 +1,88 @@
+# NAME
+
+Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API
+
+# SYNOPSIS
+
+    use Crypt::OpenSSL::PKCS12;
+
+    my $pass   = "your password";
+    my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file('cert.p12');
+
+    print $pkcs12->certificate($pass);
+    print $pkcs12->private_key($pass);
+
+    if ($pkcs12->mac_ok($pass)) {
+    ....
+
+    $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', "friendly name");
+
+# ABSTRACT
+
+    Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
+
+# DESCRIPTION
+
+    This implements a small bit of OpenSSL's PKCS12 API.
+
+# FUNCTIONS
+
+- new( )
+- new\_from\_string( $string )
+- new\_from\_file( $filename )
+
+    Create a new Crypt::OpenSSL::PKCS12 instance.
+
+- certificate( \[$pass\] )
+
+    Get the Base64 representation of the certificate.
+
+- private\_key( \[$pass\] )
+
+    Get the Base64 representation of the private key.
+
+- as\_string( \[$pass\] )
+
+    Get the binary represenation as a string.
+
+- mac\_ok( \[$pass\] )
+
+    Verifiy the certificates Message Authentication Code
+
+- changepass( $old, $new )
+
+    Change a certificate's password.
+
+- create( $cert, $key, $pass, $output\_file, $friendly\_name )
+
+    Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
+
+    $friendly\_name is optional.
+
+# EXPORT
+
+None by default.
+
+On request:
+
+- NOKEYS
+- NOCERTS
+- INFO
+- CLCERTS
+- CACERTS
+
+# SEE ALSO
+
+OpenSSL(1), Crypt::OpenSSL::X509, Crypt::OpenSSL::RSA, Crypt::OpenSSL::Bignum
+
+# AUTHOR
+
+Dan Sully, <daniel@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2004-2021 by Dan Sully
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
