@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.5  Wed May 19 22:03:48 CEST 2021
+
+  - Addressed minor issue with the implementation added in 1.4, fix lifted from Crypt::OpenSSL::X509 - Thanks Shoichi Kaji
+
+  - Added section on contributors to the POD
+
 1.4  Sun Apr 11 16:23:54 CEST 2021
 
 - Addressed issue with homebrew path reported for Crypt::OpenSSL::X509

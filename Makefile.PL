@@ -22,7 +22,7 @@ test_requires 'File::Spec::Functions' => '0'; # in core
 
 requires_external_cc();
 
-if ($^O ne 'MSWin32' and my $prefix = `brew --prefix openssl 2>@{[File::Spec->devnull]}`) {
+if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[File::Spec->devnull]}`) {
   chomp $prefix;
   inc "-I$prefix/include";
   libs "-L$prefix/lib -lcrypto -lssl";

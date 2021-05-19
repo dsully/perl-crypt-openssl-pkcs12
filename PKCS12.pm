@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -115,6 +115,34 @@ OpenSSL(1), Crypt::OpenSSL::X509, Crypt::OpenSSL::RSA, Crypt::OpenSSL::Bignum
 =head1 AUTHOR
 
 Dan Sully, E<lt>daniel@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item * Shoichi Kaji
+
+=item * Todd Rinaldo
+
+=item * Alexandr Ciornii
+
+=item * Songmu
+
+=item * Christopher Hoskin
+
+=item * jonasbn
+
+=item * Mikołaj Zalewski
+
+=item * Darko Prelec
+
+=item * Leonid Antonenkov
+
+=item * kelson
+
+=item * HMBRAND
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
