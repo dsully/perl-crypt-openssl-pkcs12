@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.7  Fri May 21 21:16:53 CEST 2021
+
+  - Removed some unnecessary code from a test, the code would not compile on Perl 5.18
+
 1.6  Thu May 20 07:32:35 CEST 2021
 
   - Added encoding declaration to POD section, I had overlooked a special character in one of the names of the contributors

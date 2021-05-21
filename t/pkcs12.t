@@ -5,9 +5,6 @@ use strict;
 use Test::More tests => 13;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
-use Env;
-
-print STDERR Dumper %ENV{TEST_VERBOSE};
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 
