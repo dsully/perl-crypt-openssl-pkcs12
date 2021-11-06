@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.7';
+our $VERSION = '1.8';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -145,6 +145,8 @@ Dan Sully, E<lt>daniel@cpan.orgE<gt>
 =item * kelson
 
 =item * HMBRAND
+
+=item * @SmartCodeMaker
 
 =back
 

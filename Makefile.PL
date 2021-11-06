@@ -27,14 +27,17 @@ if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[Fi
   inc "-I$prefix/include";
   libs "-L$prefix/lib -lcrypto -lssl";
 } else {
-  inc '-I/usr/local/opt/openssl/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
-  libs '-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl';
+  inc '-I/usr/local/opt/openssl@1.1/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
+  libs '-L/usr/local/opt/openssl@1.1/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl';
 }
 
-if ($Config::Config{myuname} =~ /darwin/i) {
-    cc_optimize_flags('-O2 -g -Wall -Werror -Wno-deprecated-declarations');
-} else {
-    cc_optimize_flags('-O2 -g -Wall -Werror');
+my $cc_option_flags = '-O2 -g -Wall -Werror';
+
+if ($Config::Config{gccversion} =~ /llvm/i) {
+  $cc_option_flags .= ' -Wno-compound-token-split-by-macro -Wno-deprecated-declarations';
+  if ($Config::Config{perl_version} <= 20) {
+    $cc_option_flags .= ' -Wno-error=pointer-bool-conversion';
+  }
 }
 
 auto_install();
