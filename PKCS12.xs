@@ -329,7 +329,7 @@ new(class)
   CODE:
 
   if ((RETVAL = PKCS12_new()) == NULL) {
-    croak("Couldn't create PKCS12_new() for class %s", (char*)class);
+    croak("Couldn't create PKCS12_new() for class %" SVf "\n", SVfARG(class));
   }
 
   OUTPUT:
@@ -361,7 +361,7 @@ new_from_string(class, string)
   /* this can come in any number of ways */
   if ((RETVAL = d2i_PKCS12_bio(bio, 0)) == NULL) {
     BIO_free_all(bio);
-    croak("%s: Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", (char*)class, ssl_error());
+    croak("%" SVf ": Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", SVfARG(class), ssl_error());
   }
 
   BIO_free_all(bio);
