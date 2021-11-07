@@ -338,22 +338,45 @@ new(class)
 Crypt::OpenSSL::PKCS12
 new_from_string(class, string)
   SV  *class
-  char *string
+  SV  *string
 
   ALIAS:
   new_from_file = 1
 
   PREINIT:
   BIO *bio;
+  STRLEN str_len;
+  char *str_ptr;
 
   CODE:
 
-  if (!string) croak("PKCS12_new_from: No string or file was passed.");
+  SvGETMAGIC(string);
+
+  if (SvPOKp(string) || SvNOKp(string) || SvIOKp(string)) {
+    if (ix == 1) {
+      /* We are not looking up the SV's UTF8 bit because BIO_new_file() accepts
+       * filename like syscall fopen() which mainly may accept octet sequences
+       * for UTF-8 in C char*. That's what we get from using SvPV_nolen. Also,
+       * using SvPV_nolen is not a bug if ASCII input is only allowed. */
+      str_ptr = SvPV_nolen(string);
+    } else {
+      /* To avoid encoding mess, caller is not allowed to provide octets from
+       * UTF-8 encoded strings. BIO_new_mem_buf() needs octet input only. */
+      if (SvUTF8(string)) {
+        croak("PKCS12_new_from: Source string must not be UTF-8 encoded (please use octets)");
+      }
+      str_ptr = SvPV(string, str_len);
+    }
+  } else {
+    croak("PKCS12_new_from: Invalid Perl type for string or file was passed (0x%x).", (unsigned int)SvFLAGS(string));
+  }
+
+  if (!str_ptr || !str_len) croak("PKCS12_new_from: No string or file was passed.");
 
   if (ix == 1) {
-    bio = BIO_new_file(string, "r");
+    bio = BIO_new_file(str_ptr, "r");
   } else {
-    bio = BIO_new_mem_buf(string, strlen(string));
+    bio = BIO_new_mem_buf(str_ptr, str_len);
   }
 
   if (!bio) croak("Failed to create BIO");
