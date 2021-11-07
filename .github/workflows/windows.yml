@@ -39,5 +39,5 @@ jobs:
           curl -sL https://cpanmin.us/ | perl - -nq --with-develop --installdeps -v .
           perl Makefile.PL
           gmake
-          gmake test
+          gmake test TEST_VERBOSE=1
 

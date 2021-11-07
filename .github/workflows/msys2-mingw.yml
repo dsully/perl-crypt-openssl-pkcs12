@@ -48,4 +48,4 @@ jobs:
         run: |
           curl -Uri https://cpanmin.us/ | perl - -nq --with-develop --installdeps -v .
           make
-          make test
+          make test TEST_VERBOSE=1
