@@ -356,9 +356,9 @@ new_from_string(class, string)
     if (ix == 1) {
       /* We are not looking up the SV's UTF8 bit because BIO_new_file() accepts
        * filename like syscall fopen() which mainly may accept octet sequences
-       * for UTF-8 in C char*. That's what we get from using SvPV_nolen. Also,
-       * using SvPV_nolen is not a bug if ASCII input is only allowed. */
-      str_ptr = SvPV_nolen(string);
+       * for UTF-8 in C char*. That's what we get from using SvPV(). Also,
+       * using SvPV() is not a bug if ASCII input is only allowed. */
+      str_ptr = SvPV(string, str_len);
     } else {
       /* To avoid encoding mess, caller is not allowed to provide octets from
        * UTF-8 encoded strings. BIO_new_mem_buf() needs octet input only. */
