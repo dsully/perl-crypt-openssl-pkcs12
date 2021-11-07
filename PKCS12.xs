@@ -374,7 +374,7 @@ new_from_string(class, string)
   if (!str_ptr || !str_len) croak("PKCS12_new_from: No string or file was passed.");
 
   if (ix == 1) {
-    bio = BIO_new_file(str_ptr, "r");
+    bio = BIO_new_file(str_ptr, "rb");
   } else {
     bio = BIO_new_mem_buf(str_ptr, str_len);
   }
