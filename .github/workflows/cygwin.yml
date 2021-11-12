@@ -49,4 +49,4 @@ jobs:
           curl -sL https://cpanmin.us/ | perl - -nq --with-develop --installdeps -v .
           perl Makefile.PL
           make
-          make test
+          make test TEST_VERBOSE=1
