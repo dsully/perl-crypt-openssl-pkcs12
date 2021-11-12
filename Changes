@@ -1,8 +1,10 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-1.8 Sat Nov  6 18:05:39 CET 2021
+1.8 Fri Nov 12 20:31:24 CET 2021
 
-- Applied patch via PR #38 from @SmartCodeMaker, formatting print of SVs displays garbage as documented in perlguts
+- Applied patch via PR #37 from @SmartCodeMaker, calculating of strings and handling Windows files properly
+
+- Applied patch via PR #38 from @SmartCodeMaker, formatting print of SVs displays garbage as documented in the perlguts documentation
 
   REF: https://perldoc.perl.org/perlguts#Formatted-Printing-of-SVs
 
