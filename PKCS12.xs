@@ -508,6 +508,40 @@ create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 
   OUTPUT:
   RETVAL
 
+
+SV*
+create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = 0, name = "PKCS12 Certificate")
+  char *cert_chain_pem
+  char *pk
+  char *pass
+  char *name
+
+  PREINIT:
+  BIO *bio;
+  EVP_PKEY* pkey;
+  PKCS12 *p12;
+  STACK_OF(X509) *cert_chain = NULL;
+
+  CODE:
+
+  pkey       = _load_pkey(pk, PEM_read_bio_PrivateKey);
+  cert_chain = _load_cert_chain(cert_chain_pem, PEM_X509_INFO_read_bio);
+  p12        = PKCS12_create(pass, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
+
+  if (!p12) {
+    ERR_print_errors_fp(stderr);
+    croak("Error creating PKCS#12 structure\n");
+  }
+
+  bio = sv_bio_create();
+  i2d_PKCS12_bio(bio, p12);
+
+  RETVAL = sv_bio_final(bio);
+  PKCS12_free(p12);
+
+  OUTPUT:
+  RETVAL
+
 SV*
 certificate(pkcs12, pwd = "")
   Crypt::OpenSSL::PKCS12 pkcs12

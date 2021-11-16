@@ -90,6 +90,12 @@ Create a new PKCS12 certificate. $cert & $key may either be strings or filenames
 
 $friendly_name is optional.
 
+=item * create_as_string( $cert, $key, $pass, $friendly_name )
+
+Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
+
+$friendly_name is optional.
+
 =back
 
 =head1 EXPORT
