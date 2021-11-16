@@ -63,13 +63,15 @@ This implements a small bit of OpenSSL's PKCS12 API.
 
     Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
 
-    $friendly\_name is optional.
+    `$friendly_name` is optional.
 
 - create\_as\_string( `$cert`, `$key`, `$pass`, `$friendly_name` )
 
     Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
 
-    $friendly\_name is optional.
+    `$friendly_name` is optional.
+
+    Returns a string holding the PKCS12 certicate.
 
 # EXPORT
 

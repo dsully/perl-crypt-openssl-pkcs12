@@ -94,13 +94,13 @@ Change a certificate's password.
 
 Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
 
-$friendly_name is optional.
+C<$friendly_name> is optional.
 
 =item * create_as_string( C<$cert>, C<$key>, C<$pass>, C<$friendly_name> )
 
 Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
 
-$friendly_name is optional.
+C<$friendly_name> is optional.
 
 Returns a string holding the PKCS12 certicate.
 
