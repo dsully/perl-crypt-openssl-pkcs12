@@ -40,17 +40,23 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   print $pkcs12->private_key($pass);
 
   if ($pkcs12->mac_ok($pass)) {
-  ....
+  ...
 
-  $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', "friendly name");
+  # Creating a file
+  $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', 'friendly name');
 
-=head1 ABSTRACT
 
-  Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
+  # Creating a string
+  my $pksc12_data = $pkcs12->create_as_string(
+    catdir($base, 'test-cert.pem'),
+    catdir($base, 'test-key.pem'),
+    $pass,
+    'Friendly Name'
+  );
 
 =head1 DESCRIPTION
 
-  This implements a small bit of OpenSSL's PKCS12 API.
+This implements a small bit of OpenSSL's PKCS12 API.
 
 =head1 FUNCTIONS
 
@@ -58,43 +64,45 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =item * new( )
 
-=item * new_from_string( $string )
+=item * new_from_string( C<$string> )
 
-=item * new_from_file( $filename )
+=item * new_from_file( C<$filename> )
 
 Create a new Crypt::OpenSSL::PKCS12 instance.
 
-=item * certificate( [$pass] )
+=item * certificate( [C<$pass>] )
 
 Get the Base64 representation of the certificate.
 
-=item * private_key( [$pass] )
+=item * private_key( [C<$pass>] )
 
 Get the Base64 representation of the private key.
 
-=item * as_string( [$pass] )
+=item * as_string( [C<$pass>] )
 
 Get the binary represenation as a string.
 
-=item * mac_ok( [$pass] )
+=item * mac_ok( [C<$pass>] )
 
 Verifiy the certificates Message Authentication Code
 
-=item * changepass( $old, $new )
+=item * changepass( C<$old>, C<$new> )
 
 Change a certificate's password.
 
-=item * create( $cert, $key, $pass, $output_file, $friendly_name )
+=item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
 Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
 
 $friendly_name is optional.
 
-=item * create_as_string( $cert, $key, $pass, $friendly_name )
+=item * create_as_string( C<$cert>, C<$key>, C<$pass>, C<$friendly_name> )
 
 Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
 
 $friendly_name is optional.
+
+Returns a string holding the PKCS12 certicate.
 
 =back
 
@@ -106,53 +114,97 @@ On request:
 
 =over 4
 
-=item * NOKEYS
+=item * C<NOKEYS>
 
-=item * NOCERTS
+=item * C<NOCERTS>
 
-=item * INFO
+=item * C<INFO>
 
-=item * CLCERTS
+=item * C<CLCERTS>
 
-=item * CACERTS
+=item * C<CACERTS>
 
 =back
 
 =head1 SEE ALSO
 
-OpenSSL(1), Crypt::OpenSSL::X509, Crypt::OpenSSL::RSA, Crypt::OpenSSL::Bignum
+=over
+
+=item * OpenSSL(1)
+
+=item * L<Crypt::OpenSSL::X509|https://metacpan.org/pod/Crypt::OpenSSL::X509>
+
+=item * L<Crypt::OpenSSL::RSA|https://metacpan.org/pod/Crypt::OpenSSL::RSA>
+
+=item * L<Crypt::OpenSSL::Bignum|https://metacpan.org/pod/Crypt::OpenSSL::Bignum>
+
+=back
 
 =head1 AUTHOR
 
-Dan Sully, E<lt>daniel@cpan.orgE<gt>
+=over
 
-=head1 CONTRIBUTORS
+=item * Dan Sully, E<lt>daniel@cpan.orgE<gt>
+
+=back
+
+Current maintainer
 
 =over
 
-=item * Shoichi Kaji
-
-=item * Todd Rinaldo
-
-=item * Alexandr Ciornii
-
-=item * Songmu
-
-=item * Christopher Hoskin
-
 =item * jonasbn
 
-=item * Mikołaj Zalewski
+=back
 
-=item * Darko Prelec
+=head1 CONTRIBUTORS
+
+In alphabetical order, contributors, bug reporters and all
+
+=over
+
+=item * @mmuehlenhoff
+
+=item * @sectokia
+
+=item * @SmartCodeMaker
+
+=item * Alexandr Ciornii, @chorny
+
+=item * Christopher Hoskin, @mans0954
+
+=item * Daisuke Murase, @typester
+
+=item * Darko Prelec, @dprelec
+
+=item * David Steinbrunner, @dsteinbrunner
+
+=item * Giuseppe Di Terlizzi, @giterlizzi
+
+=item * H.Merijn Brand, @tux
+
+=item * Hakim, @osfameron
+
+=item * J. Nick Koston, @bdraco
+
+=item * James Rouzier, @jrouzierinverse
+
+=item * jonasbn. @jonasbn
+
+=item * Kelson, @kelson42
+
+=item * Lance Wicks, @lancew
 
 =item * Leonid Antonenkov
 
-=item * kelson
+=item * Masayuki Matsuki, @songmu
 
-=item * HMBRAND
+=item * Mikołaj Zalewski
 
-=item * @SmartCodeMaker
+=item * Shoichi Kaji
+
+=item * Slaven Rezić
+
+=item * Todd Rinaldo, @toddr
 
 =back
 

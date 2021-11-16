@@ -73,4 +73,3 @@ $created = Crypt::OpenSSL::PKCS12->new_from_string($pksc12_data);
 ok($created);
 
 ok($created->mac_ok($pass));
-
