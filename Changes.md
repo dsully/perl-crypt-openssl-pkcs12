@@ -1,6 +1,6 @@
-Revision history for Perl extension Crypt::OpenSSL::PKCS12.
+# Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-1.8 Fri Nov 12 20:31:24 CET 2021
+## 1.8 Fri Nov 12 20:31:24 CET 2021
 
 - Applied patch via PR #37 from @SmartCodeMaker, calculating of strings and handling Windows files properly
 
@@ -8,21 +8,21 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
   REF: https://perldoc.perl.org/perlguts#Formatted-Printing-of-SVs
 
-1.7  Fri May 21 21:16:53 CEST 2021
+## 1.7  Fri May 21 21:16:53 CEST 2021
 
 - Removed some unnecessary code from a test, the code would not compile on Perl 5.18
 
-1.6  Thu May 20 07:32:35 CEST 2021
+## 1.6  Thu May 20 07:32:35 CEST 2021
 
 - Added encoding declaration to POD section, I had overlooked a special character in one of the names of the contributors
 
-1.5  Wed May 19 22:03:48 CEST 2021
+## 1.5  Wed May 19 22:03:48 CEST 2021
 
 - Addressed minor issue with the implementation added in 1.4, fix lifted from Crypt::OpenSSL::X509 - Thanks Shoichi Kaji
 
 - Added section on contributors to the POD
 
-1.4  Sun Apr 11 16:23:54 CEST 2021
+## 1.4  Sun Apr 11 16:23:54 CEST 2021
 
 - Addressed issue with homebrew path reported for Crypt::OpenSSL::X509
 
@@ -30,17 +30,17 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
   The pattern is the same in this distribution
 
-1.3  Thu Jun  4 21:39:30 CEST 2020
+## 1.3  Thu Jun  4 21:39:30 CEST 2020
 
 - Maintenance release addressing the broken inc/ configuration pointed out in: RT:77784 by HMBRAND
 
   REF: https://rt.cpan.org/Ticket/Display.html?id=77784
 
-1.2  Sat Oct 27 09:37:04 CEST 2018
+## 1.2  Sat Oct 27 09:37:04 CEST 2018
 
 - Maintenance release addressing the missing exclusion of the MYMETA files issue spotted by Alexandr Ciornii (@chorny) #issue32
 
-1.1  Fri Oct 26 07:54:48 CEST 2018
+## 1.1  Fri Oct 26 07:54:48 CEST 2018
 
 - PR from Todd Rinaldo (@toddr) Adding use of our instead of vars, since we are now bumping Perl version requirement
   from 5.005 to 5.6.0
@@ -50,19 +50,19 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
 - PR from Todd Rinaldo (@toddr) Add Makefile.PL support for perl 5.26.0 and above which don't include . in @INC
 
-1.0  Mon Mar 19 21:20:49 CET 2018
+## 1.0  Mon Mar 19 21:20:49 CET 2018
 
 - Re-release of 0.10, due to indexing issue with PAUSE/CPAN ref: #28
 
-0.10  Wed Mar 14 08:11:54 CET 2018
+## 0.10  Wed Mar 14 08:11:54 CET 2018
 
 - Patch from kelson (@kelson42) improving the code, going from two pass to one pass, speeding up the chain management PR #27
 
-0.9   Sun Mar 11 19:45:18 CET 2018
+## 0.9   Sun Mar 11 19:45:18 CET 2018
 
 - Patch from kelson (@kelson42) addressing compilation issues against OpenSSL 1.1.0 PR #24
 
-0.8   Sun Nov 20 19:21:47 CET 2017
+## 0.8   Sun Nov 20 19:21:47 CET 2017
 
 - Patch from jonasbn improving handling of C include paths
 
@@ -78,32 +78,32 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
 - Patch from Christopher Hoskin enabling compatibility with OpenSSL 1.1.0 and backwards compatibility with OpenSSL 1.0.2
 
-0.7   Fri Oct 24 06:16:43 PDT 2014
+## 0.7   Fri Oct 24 06:16:43 PDT 2014
 
 - Patch from Mikołaj Zalewski to fix C90 issue on CentOS.
 
 - Patch from Darko Prelec to fix compile issue #2.
 
-0.6   Thu May 10 10:44:30 PDT 2012
+## 0.6   Thu May 10 10:44:30 PDT 2012
 
 - Patch from Leonid Antonenkov to implement private key access.
 
 - Misc compile fixes.
 
-0.5   Sun May 18 08:19:14 PDT 2008
+## 0.5   Sun May 18 08:19:14 PDT 2008
 
 - Fix pod coverage tests.
 
-0.4   Sat May 17 00:47:36 PDT 2008
+## 0.4   Sat May 17 00:47:36 PDT 2008
 
 - Stop cpansmoke from emailing me.
 
-0.3   Fri Jan  5 15:36:28 PST 2007
+## 0.3   Fri Jan  5 15:36:28 PST 2007
 
 - Add more POD & coverage.
 - Fix META.yml
 
-0.2   Thu Jan  4 10:21:31 PST 2007
+## 0.2   Thu Jan  4 10:21:31 PST 2007
 
 - Use Module::Install
 
@@ -111,6 +111,6 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
 - PKCS12 Create from JoNO
 
-0.1   Thu Jan 29 17:01:38 PST 2004
+## 0.1   Thu Jan 29 17:01:38 PST 2004
 
 - Initial release.
