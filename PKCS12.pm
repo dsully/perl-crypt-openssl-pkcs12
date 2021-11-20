@@ -47,18 +47,13 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 
   # Creating a string
-  my $pksc12_data = $pkcs12->create_as_string(
-    catdir($base, 'test-cert.pem'),
-    catdir($base, 'test-key.pem'),
-    $pass,
-    'Friendly Name'
-  );
+  my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
 =head1 DESCRIPTION
 
 This implements a small bit of OpenSSL's PKCS12 API.
 
-=head1 FUNCTIONS
+=head1 SUBROUTINES
 
 =over 4
 
@@ -137,6 +132,8 @@ On request:
 =item * L<Crypt::OpenSSL::RSA|https://metacpan.org/pod/Crypt::OpenSSL::RSA>
 
 =item * L<Crypt::OpenSSL::Bignum|https://metacpan.org/pod/Crypt::OpenSSL::Bignum>
+
+=item * L<OpenSSL.org|https://www.openssl.org/>
 
 =back
 
