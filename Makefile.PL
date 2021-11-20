@@ -8,7 +8,7 @@ use Config;
 
 name('Crypt-OpenSSL-PKCS12');
 license('perl');
-perl_version('5.006');
+perl_version('5.008');
 all_from('PKCS12.pm');
 
 homepage 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
