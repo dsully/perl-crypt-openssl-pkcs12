@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.8';
+our $VERSION = '1.9';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -55,7 +55,9 @@ This documentation describes version 1.9
 
 =head1 DESCRIPTION
 
-This implements a small bit of OpenSSL's PKCS12 API.
+PKCS12 is a file format for storing cryptography objects as a single file or string. PKCS12 is commonly used to bundle a private key with its X.509 certificate or to bundle all the members of a chain of trust.
+
+This distribution implements a subset of OpenSSL's PKCS12 API.
 
 =head1 SUBROUTINES/METHODS
 
@@ -149,7 +151,7 @@ This distribution has the following dependencies
 
 =over
 
-=item * OpenSSL(1)
+=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/man1.1.1/man1/openssl.html>)
 
 =item * L<Crypt::OpenSSL::X509|https://metacpan.org/pod/Crypt::OpenSSL::X509>
 
@@ -158,6 +160,10 @@ This distribution has the following dependencies
 =item * L<Crypt::OpenSSL::Bignum|https://metacpan.org/pod/Crypt::OpenSSL::Bignum>
 
 =item * L<OpenSSL.org|https://www.openssl.org/>
+
+=item * L<Wikipedia: PKCS12|https://en.wikipedia.org/wiki/PKCS_12>
+
+=item * L<RFC:7292: "PKCS #12: Personal Information Exchange Syntax v1.1"|https://datatracker.ietf.org/doc/html/rfc7292>
 
 =back
 

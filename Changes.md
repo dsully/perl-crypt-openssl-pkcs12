@@ -1,5 +1,13 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+## 1.9 Sat Nov 20 12:49:34 CET 2021
+
+- Added new feature from `create_as_string` via PR #39 from James Rouzier (@jrouzierinverse), which returns the PKCS data as a string, for futher handling
+
+- Bumped Perl requirement from Perl 5.6 to 5.8, due to use of UTF-8 in test suite
+
+- POD cleaned up, more to come
+
 ## 1.8 Fri Nov 12 20:31:24 CET 2021
 
 - Applied patch via PR #37 from @SmartCodeMaker, calculating of strings and handling Windows files properly
