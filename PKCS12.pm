@@ -49,11 +49,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   # Creating a string
   my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
+=head1 VERSION
+
+This documentation describes version 1.9
+
 =head1 DESCRIPTION
 
 This implements a small bit of OpenSSL's PKCS12 API.
 
-=head1 SUBROUTINES
+=head1 SUBROUTINES/METHODS
 
 =over 4
 
@@ -101,7 +105,7 @@ Returns a string holding the PKCS12 certicate.
 
 =back
 
-=head1 EXPORT
+=head1 EXPORTS
 
 None by default.
 
@@ -121,6 +125,26 @@ On request:
 
 =back
 
+=head1 DIAGNOSTICS
+
+No diagnostics are documented at this time
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+No special environment or configuration is required.
+
+=head1 DEPENDENCIES
+
+This distribution has the following dependencies
+
+=over
+
+=item * An installation of OpenSSL, version 1.X.X
+
+=item * Perl 5.8
+
+=back
+
 =head1 SEE ALSO
 
 =over
@@ -136,6 +160,16 @@ On request:
 =item * L<OpenSSL.org|https://www.openssl.org/>
 
 =back
+
+=head1 INCOMPATIBILITIES
+
+Currently the library only supports OpenSSL 1.X.X
+
+The library has not been tested with OpenSSL 3.X.X and is not expected to work with this version at this time
+
+=head1 BUGS AND LIMITATIONS
+
+Please see the L<GitHub repository|https://github.com/dsully/perl-crypt-openssl-pkcs12/issues> for known issues.
 
 =head1 AUTHOR
 
@@ -205,7 +239,7 @@ In alphabetical order, contributors, bug reporters and all
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 Copyright 2004-2021 by Dan Sully
 

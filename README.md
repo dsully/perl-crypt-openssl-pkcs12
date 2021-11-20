@@ -20,18 +20,17 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 
     # Creating a string
-    my $pksc12_data = $pkcs12->create_as_string(
-      catdir($base, 'test-cert.pem'),
-      catdir($base, 'test-key.pem'),
-      $pass,
-      'Friendly Name'
-    );
+    my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
+
+# VERSION
+
+This documentation describes version 1.9
 
 # DESCRIPTION
 
 This implements a small bit of OpenSSL's PKCS12 API.
 
-# FUNCTIONS
+# SUBROUTINES/METHODS
 
 - new( )
 - new\_from\_string( `$string` )
@@ -73,7 +72,7 @@ This implements a small bit of OpenSSL's PKCS12 API.
 
     Returns a string holding the PKCS12 certicate.
 
-# EXPORT
+# EXPORTS
 
 None by default.
 
@@ -85,12 +84,38 @@ On request:
 - `CLCERTS`
 - `CACERTS`
 
+# DIAGNOSTICS
+
+No diagnostics are documented at this time
+
+# CONFIGURATION AND ENVIRONMENT
+
+No special environment or configuration is required.
+
+# DEPENDENCIES
+
+This distribution has the following dependencies
+
+- An installation of OpenSSL, version 1.X.X
+- Perl 5.8
+
 # SEE ALSO
 
 - OpenSSL(1)
 - [Crypt::OpenSSL::X509](https://metacpan.org/pod/Crypt::OpenSSL::X509)
 - [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt::OpenSSL::RSA)
 - [Crypt::OpenSSL::Bignum](https://metacpan.org/pod/Crypt::OpenSSL::Bignum)
+- [OpenSSL.org](https://www.openssl.org/)
+
+# INCOMPATIBILITIES
+
+Currently the library only supports OpenSSL 1.X.X
+
+The library has not been tested with OpenSSL 3.X.X and is not expected to work with this version at this time
+
+# BUGS AND LIMITATIONS
+
+Please see the [GitHub repository](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues) for known issues.
 
 # AUTHOR
 
@@ -127,7 +152,7 @@ In alphabetical order, contributors, bug reporters and all
 - Slaven Rezić
 - Todd Rinaldo, @toddr
 
-# COPYRIGHT AND LICENSE
+# LICENSE AND COPYRIGHT
 
 Copyright 2004-2021 by Dan Sully
 
