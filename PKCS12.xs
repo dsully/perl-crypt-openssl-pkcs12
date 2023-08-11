@@ -97,21 +97,25 @@ STACK_OF(X509)* _load_cert_chain(char* keyString, STACK_OF(X509_INFO)*(*p_loader
   return stack;
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+long bio_write_cb(struct bio_st *bm, int m, const char *ptr, size_t len, int l, long x, int y, size_t *processed) {
+#else
+long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int len, long x, long y) {
+#endif
 /* stolen from OpenSSL.xs */
-long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int l, long x, long y) {
 
   if (m == BIO_CB_WRITE) {
     SV *sv = (SV *) BIO_get_callback_arg(bm);
-    sv_catpvn(sv, ptr, l);
+    sv_catpvn(sv, ptr, len);
   }
 
   if (m == BIO_CB_PUTS) {
     SV *sv = (SV *) BIO_get_callback_arg(bm);
-    l = strlen(ptr);
-    sv_catpvn(sv, ptr, l);
+    len = strlen(ptr);
+    sv_catpvn(sv, ptr, len);
   }
 
-  return l;
+  return len;
 }
 
 static BIO* sv_bio_create(void) {
@@ -121,7 +125,11 @@ static BIO* sv_bio_create(void) {
   /* create an in-memory BIO abstraction and callbacks */
   BIO *bio = BIO_new(BIO_s_mem());
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  BIO_set_callback_ex(bio, bio_write_cb);
+#else
   BIO_set_callback(bio, bio_write_cb);
+#endif
   BIO_set_callback_arg(bio, (void *)sv);
 
   return bio;
@@ -134,7 +142,11 @@ static SV* sv_bio_final(BIO *bio) {
   (void)BIO_flush(bio);
   sv = (SV *)BIO_get_callback_arg(bio);
   BIO_set_callback_arg(bio, (void *)NULL);
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  BIO_set_callback_ex(bio, (void *)NULL);
+#else
   BIO_set_callback(bio, (void *)NULL);
+#endif
   BIO_free_all(bio);
 
   if (!sv) sv = &PL_sv_undef;
