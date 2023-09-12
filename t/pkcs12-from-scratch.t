@@ -28,7 +28,7 @@ my $pkcs12_result = `openssl pkcs12 -export -out certs/scratch-pkcs12.p12 -inkey
 #my $out = system("openssl pkcs12 -export -out certs/scratch-pkcs12.p12 -inkey certs/test-key.pem -in certs/test-cert.pem -passout pass:testing");
 
 unlink 't/scratch-cert.pem';
-#unlink 't/scratch-csr.pem';
+unlink 't/scratch-csr.pem';
 unlink 't/scratch-key.pem';
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
