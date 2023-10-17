@@ -15,8 +15,6 @@ homepage 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
 repository 'https://github.com/dsully/perl-crypt-openssl-pkcs12';
 bugtracker 'https://github.com/dsully/perl-crypt-openssl-pkcs12/issues';
 
-test_requires 'Crypt::OpenSSL::Guess' => '0';
-test_requires 'Crypt::OpenSSL::PKCS10' => '0.23';
 test_requires 'Test::Pod::Coverage' => '1.08';
 test_requires 'Pod::Coverage' => '0.19';
 test_requires 'Test::More' => '0.47';
