@@ -24,7 +24,8 @@ jobs:
         run: |
           brew install openssl@1.1
 
-      # REF: https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md (see link above, at the time of writing we get Perl 5.34.0 with macOS 10.15)
+      # REF: https://github.com/actions/runner-images/tree/main/images/macos
+      # See link above, at the time of writing we get Perl 5.36.1 with macOS 13.5.1)
       - name: Set up Perl
         run: |
           brew install perl
