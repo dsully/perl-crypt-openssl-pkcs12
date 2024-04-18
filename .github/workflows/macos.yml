@@ -19,12 +19,9 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
-      - name: install openssl
-        run: |
-          brew install openssl@1.1
-
-      # REF: https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md (see link above, at the time of writing we get Perl 5.34.0 with macOS 10.15)
+      - uses: actions/checkout@v4
+      # REF: https://github.com/actions/runner-images/tree/main/images/macos
+      # See link above, at the time of writing we get Perl 5.36.1 with macOS 13.5.1)
       - name: Set up Perl
         run: |
           brew install perl
@@ -32,10 +29,13 @@ jobs:
           echo "/Users/runner/perl5/bin" >> $GITHUB_PATH
       - name: perl -V
         run: perl -V
-
-      - name: Run Tests
+      - name: Install Dependencies
         run: |
           curl -sL https://cpanmin.us/ | perl - -nq --with-develop --installdeps -v .
+      - name: Build Module
+        run: |
           perl Makefile.PL
           make
+      - name: Run Tests
+        run: |
           make test TEST_VERBOSE=1

@@ -28,24 +28,30 @@ jobs:
           git config --global core.eol lf
         shell: powershell
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Set up Perl
+      - name: Set up msys2
         uses: msys2/setup-msys2@v2
         with:
           update: true
           install: >-
             base-devel
-            mingw-w64-x86_64-toolchain
-            mingw-w64-x86_64-perl
-            msys/libcrypt-devel
-            msys/openssl-devel
+            gcc
+            libopenssl
+            openssl-devel
+            perl
+            perl-devel
       - name: perl -V
         run: |
           perl -V
-          perl -V:make
-      - name: Run Tests
+          uname -a
+      - name: Install Dependencies
         run: |
           curl -Uri https://cpanmin.us/ | perl - -nq --with-develop --installdeps -v .
+      - name: Build Module
+        run: |
+          perl Makefile.PL
           make
+      - name: Run Tests
+        run: |
           make test TEST_VERBOSE=1

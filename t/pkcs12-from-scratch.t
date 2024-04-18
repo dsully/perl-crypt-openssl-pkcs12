@@ -1,11 +1,34 @@
-#!/usr/bin/perl
-
-use warnings;
 use strict;
-use Test::More tests => 29;
+use warnings;
+
+use Test::More tests => 30;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
 use Crypt::OpenSSL::Guess;
+use Crypt::OpenSSL::PKCS10 qw( :const );
+
+my ($major, $minor, $patch) = openssl_version();
+
+diag("OpenSSL version: $major.$minor $patch\n");
+
+my $req = Crypt::OpenSSL::PKCS10->new;
+$req->set_subject("/C=RO/O=UTI/OU=ssi");
+$req->add_ext(Crypt::OpenSSL::PKCS10::NID_key_usage,"critical,digitalSignature,keyEncipherment");
+$req->add_ext(Crypt::OpenSSL::PKCS10::NID_ext_key_usage,"serverAuth, nsSGC, msSGC, 1.3.4");
+$req->add_ext(Crypt::OpenSSL::PKCS10::NID_subject_alt_name,"email:steve\@openssl.org");
+$req->add_ext_final();
+$req->sign();
+$req->write_pem_req('t/scratch-csr.pem');
+$req->write_pem_pk('t/scratch-key.pem');
+
+#my $cert_result = `openssl x509 -req -signkey t/scratch-key.pem -in t/scratch-csr.pem -out t/scratch-cert.pem -CAcreateserial -days 365 -sha256`;
+my $prefix = find_openssl_prefix();
+my $pkcs12_result = `$prefix/bin/openssl pkcs12 -export -out certs/scratch-pkcs12.p12 -inkey certs/test-key.pem -in certs/test-cert.pem -certfile certs/test-ca.pem -passout pass:testing`;
+#my $out = system("openssl pkcs12 -export -out certs/scratch-pkcs12.p12 -inkey certs/test-key.pem -in certs/test-cert.pem -passout pass:testing");
+
+unlink 't/scratch-cert.pem';
+unlink 't/scratch-csr.pem';
+unlink 't/scratch-key.pem';
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 
@@ -39,16 +62,7 @@ BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 my $base   = 'certs';
 my $pass   = 'testing';
 
-my ($major, $minor, $patch) = openssl_version();
-
-diag("OpenSSL version: $major.$minor $patch\n");
-
-my $certfile;
-if ($major le "1.1" )  {
-    $certfile = catdir($base, 'test_le_1.1.p12');
-} else {
-    $certfile = catdir($base, 'test.p12');
-}
+my $certfile = 'certs/scratch-pkcs12.p12';
 
 diag("Attempting to read certificate string from file $certfile");
 
@@ -133,6 +147,8 @@ my $created = Crypt::OpenSSL::PKCS12->new_from_file($outfile);
 
 ok($created);
 
+ok($created->certificate($pass), 'Got Certificate');
 ok($created->mac_ok($pass), 'Reasserting new mac');
 
+unlink 'certs/scratch-pkcs12.p12';
 unlink $outfile;
