@@ -8,7 +8,9 @@
 #include <openssl/pkcs12.h>
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
-
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/provider.h>
+#endif
 #define NOKEYS          0x1
 #define NOCERTS         0x2
 #define INFO            0x4
@@ -27,6 +29,14 @@
 #endif
 
 const EVP_CIPHER *enc;
+int dump_certs_pkeys_bags(BIO *out, const STACK_OF(PKCS12_SAFEBAG) *bags,
+                           const char *pass, int passlen, int options,
+                           char *pempass, const EVP_CIPHER *enc);
+static int alg_print(BIO *bio, const X509_ALGOR *alg);
+void print_attribute(BIO *out, const ASN1_TYPE *av);
+int print_attribs(BIO *out, const STACK_OF(X509_ATTRIBUTE) *attrlst, const char *name);
+void hex_prin(BIO *out, unsigned char *buf, int len);
+void dump_cert_text(BIO *out, X509 *x);
 
 /* fake our package name */
 typedef PKCS12*  Crypt__OpenSSL__PKCS12;
@@ -178,7 +188,7 @@ static const char *ssl_error(void) {
 }
 
 /* these are trimmed from their openssl/apps/pkcs12.c counterparts */
-int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen, int options, char *pempass) {
+int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, const char *pass, int passlen, int options, char *pempass) {
 
   EVP_PKEY *pkey;
   X509 *x509;
@@ -211,6 +221,10 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (!(pkey = EVP_PKCS82PKEY (p8c))) return 0;
 
+      if (options & INFO) {
+        BIO_printf(bio, "Key bag\n");
+        print_attribs(bio, PKCS8_pkey_get0_attrs(p8c), "Key Attributes");
+      }
       PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
 
       EVP_PKEY_free(pkey);
@@ -219,6 +233,16 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
     case NID_pkcs8ShroudedKeyBag: ;
 
+      if (options & INFO) {
+        const X509_SIG *tp8;
+        const X509_ALGOR *tp8alg;
+
+        BIO_printf(bio, "Shrouded Keybag: ");
+        tp8 = PKCS12_SAFEBAG_get0_pkcs8(bag);
+        X509_SIG_get0(tp8, &tp8alg, NULL);
+        alg_print(bio, tp8alg);
+        print_attribs(bio, attrs, "Bag Attributes");
+      }
       if (options & NOKEYS) return 1;
 
       if ((p8 = PKCS12_decrypt_skey(bag, pass, passlen)) == NULL)
@@ -231,6 +255,8 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       PKCS8_PRIV_KEY_INFO_free(p8);
 
+      if (options & INFO)
+        print_attribs(bio, PKCS8_pkey_get0_attrs(p8), "Key Attributes");
       PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
 
       EVP_PKEY_free(pkey);
@@ -253,6 +279,11 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
       if (PKCS12_SAFEBAG_get_bag_nid(bag) != NID_x509Certificate) return 1;
 
       if ((x509 = PKCS12_SAFEBAG_get1_cert(bag)) == NULL) return 0;
+      if (options & INFO) {
+        BIO_printf(bio, "Certificate bag\n");
+        print_attribs(bio, attrs, "Bag Attributes");
+        dump_cert_text(bio, x509);
+      }
       PEM_write_bio_X509 (bio, x509);
 
       X509_free(x509);
@@ -260,23 +291,27 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
       break;
 
     case NID_secretBag:
-        if (options & INFO) return 1;
-        //print_attribute(bio, PKCS12_SAFEBAG_get0_bag_obj(bag));
-        printf ("Well this is a NID_secretBag\n");
-
+        if (options & INFO)
+          BIO_printf(bio, "Secret bag\n");
+        print_attribs(bio, attrs, "Bag Attributes");
+        BIO_printf(bio, "Bag Type: ");
+        i2a_ASN1_OBJECT(bio, PKCS12_SAFEBAG_get0_bag_type(bag));
+        BIO_printf(bio, "\nBag Value: ");
+        print_attribute(bio, PKCS12_SAFEBAG_get0_bag_obj(bag));
         break;
     case NID_safeContentsBag:
-        if (options & INFO) return 1;
-        //dump_certs_pkeys_bags(bio, PKCS12_SAFEBAG_get0_safes(bag),
-        //                pass, passlen, options, pempass, enc);
-        printf ("Well this is a NID_safeContentsBag\n");
+        if (options & INFO)
+          BIO_printf(bio, "Safe Contents bag\n");
+        print_attribs(bio, attrs, "Bag Attributes");
+        dump_certs_pkeys_bags(bio, PKCS12_SAFEBAG_get0_safes(bag),
+                                      pass, passlen, options, pempass, enc);
         break;
   }
 
   return 1;
 }
 
-int dump_certs_pkeys_bags(BIO *bio, STACK_OF(PKCS12_SAFEBAG) *bags, char *pass, int passlen, int options, char *pempass) {
+int dump_certs_pkeys_bags(BIO *bio, const STACK_OF(PKCS12_SAFEBAG) *bags, const char *pass, int passlen, int options, char *pempass, const EVP_CIPHER *enc) {
 
   int i;
 
@@ -314,9 +349,19 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
     if (bagnid == NID_pkcs7_data) {
 
       bags = PKCS12_unpack_p7data(p7);
+      if (options & INFO)
+        BIO_printf(bio, "PKCS7 Data\n");
 
     } else if (bagnid == NID_pkcs7_encrypted) {
 
+      if (options & INFO) {
+        BIO_printf(bio, "PKCS7 Encrypted data: ");
+        if (p7->d.encrypted == NULL) {
+          BIO_printf(bio, "<no data>\n");
+        } else {
+          alg_print(bio, p7->d.encrypted->enc_data->algorithm);
+        }
+      }
       bags = PKCS12_unpack_p7encdata(p7, pass, passlen);
 
     } else {
@@ -325,7 +370,7 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
 
     if (bags == NULL) return 0;
 
-    if (!dump_certs_pkeys_bags(bio, bags, pass, passlen, options, pempass)) {
+    if (!dump_certs_pkeys_bags(bio, bags, pass, passlen, options, pempass, enc)) {
 
       sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
       return 0;
@@ -336,6 +381,248 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
 
   sk_PKCS7_pop_free(asafes, PKCS7_free);
 
+  return 1;
+}
+# define B_FORMAT_TEXT   0x8000
+# define FORMAT_TEXT    (1 | B_FORMAT_TEXT)     /* Generic text */
+int FMT_istext(int format)
+{
+  return (format & B_FORMAT_TEXT) == B_FORMAT_TEXT;
+}
+
+BIO *dup_bio_err(int format)
+{
+  BIO *b = BIO_new_fp(stderr,
+                      BIO_NOCLOSE | (FMT_istext(format) ? BIO_FP_TEXT : 0));
+
+  return b;
+}
+
+static unsigned long nmflag = 0;
+static char nmflag_set = 0;
+# define XN_FLAG_SPC_EQ          (1 << 23)/* Put spaces round '=' */
+
+unsigned long get_nameopt(void)
+{
+  return
+      nmflag_set ? nmflag : XN_FLAG_SEP_CPLUS_SPC | ASN1_STRFLGS_UTF8_CONVERT | XN_FLAG_SPC_EQ;
+}
+
+void print_name(BIO *out, const char *title, const X509_NAME *nm)
+{
+  char *buf;
+  char mline = 0;
+  int indent = 0;
+  unsigned long lflags = get_nameopt();
+
+  if (out == NULL)
+    return;
+  if (title != NULL)
+    BIO_puts(out, title);
+  if ((lflags & XN_FLAG_SEP_MASK) == XN_FLAG_SEP_MULTILINE) {
+    mline = 1;
+    indent = 4;
+  }
+  if (lflags == XN_FLAG_COMPAT) {
+    buf = X509_NAME_oneline(nm, 0, 0);
+    BIO_puts(out, buf);
+    BIO_puts(out, "\n");
+    OPENSSL_free(buf);
+  } else {
+    if (mline)
+      BIO_puts(out, "\n");
+      X509_NAME_print_ex(out, nm, indent, lflags);
+      BIO_puts(out, "\n");
+  }
+}
+
+void dump_cert_text(BIO *out, X509 *x)
+{
+  print_name(out, "subject=", X509_get_subject_name(x));
+  print_name(out, "issuer=", X509_get_issuer_name(x));
+}
+
+void hex_prin(BIO *out, unsigned char *buf, int len)
+{
+  int i;
+  for (i = 0; i < len; i++)
+  BIO_printf(out, "%02X ", buf[i]);
+}
+
+/* Generalised x509 attribute value print */
+
+void print_attribute(BIO *out, const ASN1_TYPE *av)
+{
+  char *value;
+  const char *ln;
+  char objbuf[80];
+
+  switch (av->type) {
+  case V_ASN1_BMPSTRING:
+    value = OPENSSL_uni2asc(av->value.bmpstring->data,
+                                av->value.bmpstring->length);
+    BIO_printf(out, "%s\n", value);
+    OPENSSL_free(value);
+    break;
+
+  case V_ASN1_UTF8STRING:
+    BIO_printf(out, "%.*s\n", av->value.utf8string->length,
+                   av->value.utf8string->data);
+    break;
+
+  case V_ASN1_OCTET_STRING:
+    hex_prin(out, av->value.octet_string->data,
+                 av->value.octet_string->length);
+    BIO_printf(out, "\n");
+    break;
+
+  case V_ASN1_BIT_STRING:
+    hex_prin(out, av->value.bit_string->data,
+                 av->value.bit_string->length);
+    BIO_printf(out, "\n");
+    break;
+
+  case V_ASN1_OBJECT:
+    ln = OBJ_nid2ln(OBJ_obj2nid(av->value.object));
+    if (!ln)
+      ln = "";
+  OBJ_obj2txt(objbuf, sizeof(objbuf), av->value.object, 1);
+  BIO_printf(out, "%s (%s)", ln, objbuf);
+  BIO_printf(out, "\n");
+  break;
+
+  default:
+    BIO_printf(out, "<Unsupported tag %d>\n", av->type);
+    break;
+  }
+}
+
+/* Generalised attribute print: handle PKCS#8 and bag attributes */
+
+int print_attribs(BIO *out, const STACK_OF(X509_ATTRIBUTE) *attrlst,
+                  const char *name)
+{
+  X509_ATTRIBUTE *attr;
+  ASN1_TYPE *av;
+  int i, j, attr_nid;
+  if (!attrlst) {
+    BIO_printf(out, "%s: <No Attributes>\n", name);
+    return 1;
+  }
+  if (!sk_X509_ATTRIBUTE_num(attrlst)) {
+    BIO_printf(out, "%s: <Empty Attributes>\n", name);
+    return 1;
+  }
+  BIO_printf(out, "%s\n", name);
+  for (i = 0; i < sk_X509_ATTRIBUTE_num(attrlst); i++) {
+    ASN1_OBJECT *attr_obj;
+    attr = sk_X509_ATTRIBUTE_value(attrlst, i);
+    attr_obj = X509_ATTRIBUTE_get0_object(attr);
+    attr_nid = OBJ_obj2nid(attr_obj);
+    BIO_printf(out, "    ");
+    if (attr_nid == NID_undef) {
+      i2a_ASN1_OBJECT(out, attr_obj);
+      BIO_printf(out, ": ");
+    } else {
+      BIO_printf(out, "%s: ", OBJ_nid2ln(attr_nid));
+    }
+
+    if (X509_ATTRIBUTE_count(attr)) {
+      for (j = 0; j < X509_ATTRIBUTE_count(attr); j++)
+      {
+        av = X509_ATTRIBUTE_get0_type(attr, j);
+        print_attribute(out, av);
+      }
+    } else {
+      BIO_printf(out, "<No Values>\n");
+    }
+  }
+  return 1;
+}
+
+static int alg_print(BIO *bio, const X509_ALGOR *alg)
+{
+  int pbenid, aparamtype;
+  const ASN1_OBJECT *aoid;
+  const void *aparam;
+  PBEPARAM *pbe = NULL;
+
+  X509_ALGOR_get0(&aoid, &aparamtype, &aparam, alg);
+  pbenid = OBJ_obj2nid(aoid);
+
+  BIO_printf(bio, "%s", OBJ_nid2ln(pbenid));
+
+  /*
+  * If PBE algorithm is PBES2 decode algorithm parameters
+  * for additional details.
+  */
+  if (pbenid == NID_pbes2) {
+    PBE2PARAM *pbe2 = NULL;
+    int encnid;
+    if (aparamtype == V_ASN1_SEQUENCE)
+      pbe2 = ASN1_item_unpack(aparam, ASN1_ITEM_rptr(PBE2PARAM));
+    if (pbe2 == NULL) {
+      BIO_puts(bio, ", <unsupported parameters>");
+      goto done;
+    }
+    X509_ALGOR_get0(&aoid, &aparamtype, &aparam, pbe2->keyfunc);
+    pbenid = OBJ_obj2nid(aoid);
+    X509_ALGOR_get0(&aoid, NULL, NULL, pbe2->encryption);
+    encnid = OBJ_obj2nid(aoid);
+    BIO_printf(bio, ", %s, %s", OBJ_nid2ln(pbenid),
+                   OBJ_nid2sn(encnid));
+    /* If KDF is PBKDF2 decode parameters */
+    if (pbenid == NID_id_pbkdf2) {
+      PBKDF2PARAM *kdf = NULL;
+      int prfnid;
+      if (aparamtype == V_ASN1_SEQUENCE)
+        kdf = ASN1_item_unpack(aparam, ASN1_ITEM_rptr(PBKDF2PARAM));
+      if (kdf == NULL) {
+        BIO_puts(bio, ", <unsupported parameters>");
+        goto done;
+      }
+
+      if (kdf->prf == NULL) {
+        prfnid = NID_hmacWithSHA1;
+      } else {
+        X509_ALGOR_get0(&aoid, NULL, NULL, kdf->prf);
+        prfnid = OBJ_obj2nid(aoid);
+      }
+      BIO_printf(bio, ", Iteration %ld, PRF %s",
+                       ASN1_INTEGER_get(kdf->iter), OBJ_nid2sn(prfnid));
+      PBKDF2PARAM_free(kdf);
+#ifndef OPENSSL_NO_SCRYPT
+      } else if (pbenid == NID_id_scrypt) {
+        SCRYPT_PARAMS *kdf = NULL;
+
+        if (aparamtype == V_ASN1_SEQUENCE)
+          kdf = ASN1_item_unpack(aparam, ASN1_ITEM_rptr(SCRYPT_PARAMS));
+        if (kdf == NULL) {
+          BIO_puts(bio, ", <unsupported parameters>");
+          goto done;
+        }
+        BIO_printf(bio, ", Salt length: %d, Cost(N): %ld, "
+                       "Block size(r): %ld, Parallelism(p): %ld",
+                       ASN1_STRING_length(kdf->salt),
+                       ASN1_INTEGER_get(kdf->costParameter),
+                       ASN1_INTEGER_get(kdf->blockSize),
+                       ASN1_INTEGER_get(kdf->parallelizationParameter));
+        SCRYPT_PARAMS_free(kdf);
+#endif
+    }
+    PBE2PARAM_free(pbe2);
+  } else {
+    if (aparamtype == V_ASN1_SEQUENCE)
+      pbe = ASN1_item_unpack(aparam, ASN1_ITEM_rptr(PBEPARAM));
+      if (pbe == NULL) {
+        BIO_puts(bio, ", <unsupported parameters>");
+        goto done;
+      }
+      BIO_printf(bio, ", Iteration %ld", ASN1_INTEGER_get(pbe->iter));
+      PBEPARAM_free(pbe);
+  }
+  done:
+  BIO_puts(bio, "\n");
   return 1;
 }
 
@@ -392,10 +679,24 @@ new_from_string(class, string)
   BIO *bio;
   STRLEN str_len;
   char *str_ptr;
-
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  OSSL_PROVIDER *legacy = NULL;
+  OSSL_PROVIDER *deflt = NULL;
+#endif
   CODE:
 
   SvGETMAGIC(string);
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  legacy = OSSL_PROVIDER_load(NULL, "legacy");
+    if (legacy == NULL) {
+      croak("Failed to load Legacy provider\n");
+    }
+  deflt = OSSL_PROVIDER_load(NULL, "default");
+  if (deflt == NULL) {
+      OSSL_PROVIDER_unload(legacy);
+      croak("Failed to load Default provider\n");
+  }
+#endif
 
   if (SvPOKp(string) || SvNOKp(string) || SvIOKp(string)) {
     if (ix == 1) {
@@ -625,6 +926,47 @@ private_key(pkcs12, pwd = "")
   PKCS12_unpack_authsafes(pkcs12);
 
   dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), NOCERTS, NULL);
+
+  RETVAL = sv_bio_final(bio);
+
+  OUTPUT:
+  RETVAL
+
+SV*
+info(pkcs12, pwd = "")
+  Crypt::OpenSSL::PKCS12 pkcs12
+  char *pwd
+
+  PREINIT:
+  BIO *bio;
+  STACK_OF(PKCS7) *asafes = NULL;
+
+  const ASN1_INTEGER *tmaciter;
+  const X509_ALGOR *macalgid;
+  const ASN1_OBJECT *macobj;
+  const ASN1_OCTET_STRING *tmac;
+  const ASN1_OCTET_STRING *tsalt;
+
+  CODE:
+
+  bio = sv_bio_create();
+
+  if ((asafes = PKCS12_unpack_authsafes(pkcs12)) == NULL)
+        RETVAL = newSVpvn("",0);
+
+  PKCS12_get0_mac(&tmac, &macalgid, &tsalt, &tmaciter, pkcs12);
+  /* current hash algorithms do not use parameters so extract just name,
+     in future alg_print() may be needed */
+  X509_ALGOR_get0(&macobj, NULL, NULL, macalgid);
+  BIO_puts(bio, "MAC: ");
+  i2a_ASN1_OBJECT(bio, macobj);
+  BIO_printf(bio, ", Iteration %ld\n",
+        tmaciter != NULL ? ASN1_INTEGER_get(tmaciter) : 1L);
+  BIO_printf(bio, "MAC length: %ld, salt length: %ld\n",
+        tmac != NULL ? ASN1_STRING_length(tmac) : 0L,
+        tsalt != NULL ? ASN1_STRING_length(tsalt) : 0L);
+
+  dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), INFO, NULL);
 
   RETVAL = sv_bio_final(bio);
 

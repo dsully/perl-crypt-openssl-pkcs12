@@ -105,6 +105,10 @@ C<$friendly_name> is optional.
 
 Returns a string holding the PKCS12 certicate.
 
+=item * info( [C<$pass>] )
+
+Dump the information about the pkcs12 file and the certificates and keys
+
 =back
 
 =head1 EXPORTS

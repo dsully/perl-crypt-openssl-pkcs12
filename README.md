@@ -74,6 +74,10 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
     Returns a string holding the PKCS12 certicate.
 
+- info( \[`$pass`\] )
+
+    Dump the information about the pkcs12 file and the certificates and keys
+
 # EXPORTS
 
 None by default.
