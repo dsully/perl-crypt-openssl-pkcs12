@@ -13,3 +13,4 @@ local
 MANIFEST.bak
 MANIFEST
 .vstags
+.vscode/
