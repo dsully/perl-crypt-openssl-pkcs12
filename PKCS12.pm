@@ -141,7 +141,7 @@ This distribution has the following dependencies
 
 =over
 
-=item * An installation of OpenSSL, version 1.X.X
+=item * An installation of OpenSSL, either version 1.X.X or version 3.X.X
 
 =item * Perl 5.8
 
@@ -169,9 +169,7 @@ This distribution has the following dependencies
 
 =head1 INCOMPATIBILITIES
 
-Currently the library only supports OpenSSL 1.X.X
-
-The library has not been tested with OpenSSL 3.X.X and is not expected to work with this version at this time
+Currently the library has been updated to support both OpenSSL 1.X.X and OpenSSL 3.X.X
 
 =head1 BUGS AND LIMITATIONS
 
@@ -249,7 +247,7 @@ In alphabetical order, contributors, bug reporters and all
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2004-2021 by Dan Sully
+Copyright 2004-2024 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
