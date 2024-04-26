@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Exporter;
 
-our $VERSION = '1.9';
+our $VERSION = '1.10';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -240,6 +240,8 @@ In alphabetical order, contributors, bug reporters and all
 =item * Shoichi Kaji
 
 =item * Slaven Rezić
+
+=item * Timothy Legge, @timlegge
 
 =item * Todd Rinaldo, @toddr
 

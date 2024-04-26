@@ -1,5 +1,11 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+## 1.10 (TRIAL) Fri Apr 26 16:09:56 CEST 2024
+
+- Improved support for OpenSSL 3.0 via [PR](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/42) from @timlegge
+
+- Distribution tooling changed from `Module::Install` to `Dist::Zilla`
+
 ## 1.9 Sat Nov 20 12:49:34 CET 2021
 
 - Added new feature from `create_as_string` via PR #39 from James Rouzier (@jrouzierinverse), which returns the PKCS data as a string, for futher handling
