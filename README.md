@@ -154,6 +154,7 @@ In alphabetical order, contributors, bug reporters and all
 - Mikołaj Zalewski
 - Shoichi Kaji
 - Slaven Rezić
+- Timothy Legge, @timlegge
 - Todd Rinaldo, @toddr
 
 # LICENSE AND COPYRIGHT
