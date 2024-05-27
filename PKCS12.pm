@@ -109,6 +109,11 @@ Returns a string holding the PKCS12 certicate.
 
 Dump the information about the pkcs12 file and the certificates and keys
 
+=item * info_as_hash( [C<$pass>] )
+
+Place the information about the pkcs12 file, the certificates and keys
+in a hash
+
 =back
 
 =head1 EXPORTS

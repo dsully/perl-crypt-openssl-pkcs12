@@ -78,6 +78,11 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
     Dump the information about the pkcs12 file and the certificates and keys
 
+- info\_as\_hash( \[`$pass`\] )
+
+    Place the information about the pkcs12 file, the certificates and keys
+    in a hash
+
 # EXPORTS
 
 None by default.
