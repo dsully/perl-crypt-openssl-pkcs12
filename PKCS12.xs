@@ -18,6 +18,9 @@
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #define PKCS12_SAFEBAG_get0_p8inf(o) ((o)->value.keybag)
 #define PKCS12_SAFEBAG_get0_attr PKCS12_get_attr
+#define PKCS12_SAFEBAG_get_bag_nid M_PKCS12_cert_bag_type
+#define PKCS12_SAFEBAG_get_nid M_PKCS12_bag_type
+#define PKCS12_SAFEBAG_get1_cert PKCS12_certbag2x509
 #define CONST_PKCS8_PRIV_KEY_INFO PKCS8_PRIV_KEY_INFO
 #else
 #define CONST_PKCS8_PRIV_KEY_INFO const PKCS8_PRIV_KEY_INFO
@@ -181,10 +184,14 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
   X509 *x509;
   PKCS8_PRIV_KEY_INFO *p8;
   CONST_PKCS8_PRIV_KEY_INFO *p8c;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
   const STACK_OF(X509_ATTRIBUTE) *attrs;
+#endif
   int ret = 0;
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
   attrs = PKCS12_SAFEBAG_get0_attrs(bag);
+#endif
 
 #ifndef OPENSSL_NO_DES
   EVP_CIPHER *default_enc = (EVP_CIPHER *)EVP_des_ede3_cbc();
