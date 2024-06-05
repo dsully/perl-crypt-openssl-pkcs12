@@ -1,8 +1,15 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+## 1.11 (TRIAL) Wed Jun  5 20:21:54 CEST 2024
+
+- Improved support for older versions of OpenSSL via PR [#46](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/46) from @timlegge
+  This should address reports on failing tests from CPAN testers, see also: [#45](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/45)
+
+- Minor cleanup to repository files for used for varies tools
+
 ## 1.10 (TRIAL) Fri Apr 26 16:09:56 CEST 2024
 
-- Improved support for OpenSSL 3.0 via [PR](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/42) from @timlegge
+- Improved support for OpenSSL 3.0 via RT: [42](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/42) from @timlegge
 
 - Distribution tooling changed from `Module::Install` to `Dist::Zilla`
 
