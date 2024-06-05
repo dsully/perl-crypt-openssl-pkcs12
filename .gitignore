@@ -36,3 +36,6 @@ inc/
 
 # Carton
 local/
+
+# Dist::Zilla / dzil
+Crypt-OpenSSL-PKCS12-*.*/
