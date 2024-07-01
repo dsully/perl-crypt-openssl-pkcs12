@@ -49,9 +49,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   # Creating a string
   my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
+  # Reproducing OpenSSL's info
+  my $info = $pkcs12->info($pass);
+
+  # Accessing OpenSSL's info as a hash
+  my $info_hash = $pkcs12->info_as_hash($pass);
+
 =head1 VERSION
 
-This documentation describes version 1.9
+This documentation describes version 1.92
 
 =head1 DESCRIPTION
 
@@ -105,14 +111,129 @@ C<$friendly_name> is optional.
 
 Returns a string holding the PKCS12 certicate.
 
-=item * info( [C<$pass>] )
+=item * info( C<$pass> )
 
-Dump the information about the pkcs12 file and the certificates and keys
+Returns a string containing the output of information about the pkcs12 file in
+the same format as produced by the openssl command:
 
-=item * info_as_hash( [C<$pass>] )
+    openssl pkcs12 -in certs/test_le_1.1.p12 -info -nodes
 
-Place the information about the pkcs12 file, the certificates and keys
-in a hash
+=item * info_as_hash( C<$pass> )
+
+Places the information about the pkcs12 file, the certificates and keys
+in a hash.
+
+The format of the hash is complex to represent the data in the PKCS12 file:
+
+Essentially, the hash follows the format of the -info output.
+
+1. pkcs7_data and pkcs7_encrypted_data are arrays as more than one of each can exist
+2. mac provieds the top level mac parameters for the file
+3. safe_contents_bag is an array that contains an array of bags
+4. bags is an array of bags
+5. a bag is a container for a key or certificate
+
+Each bag has a type and the following are available:
+
+1. key_bag
+2. certificate_bag
+3. shrouded_keybag
+4. secret_bag
+5. safe_contents_bag
+
+{
+    mac                    {
+        digest        "sha1",
+        iteration     2048,
+        length        20,
+        salt_length   20
+    },
+    pkcs7_data             [
+        [0] {
+                bags   [
+                    [0] {
+                            bag_attributes   {
+                                friendlyName   "...",
+                                localKeyID     "..." (dualvar: 54)
+                            },
+                            key              "...",
+                            key_attributes   {
+                                "X509v3 Key Usage"   10
+                            },
+                            parameters       {
+                                iteration        10000,
+                                nid_long_name    "PBKDF2",
+                                nid_short_name   "PBKDF2"
+                            },
+                            type             "shrouded_keybag"
+                        }
+                ]
+            },
+        [1] {
+                safe_contents_bag   [
+                    [0] {
+                            bags   [
+                                [0] {
+                                        bag_attributes   {
+                                            localKeyID   "01" (dualvar: 1)
+                                            friendlyName   "",
+                                        },
+                                        cert             "...".
+                                        issuer           "...",
+                                        subject          "...",
+                                        type             "certificate_bag"
+                                        }
+                            ],
+                            type   "safe_contents_bag"
+                        }
+                ]
+            },
+        [2] {
+                bags   [
+                    [0] {
+                            bag_attributes   {
+                                localKeyID   "02" (dualvar: 2)
+                            },
+                            cert             "...",
+                            issuer           "...",
+                            subject          "...",
+                            type             "certificate_bag"
+                        }
+                ]
+            },
+    ],
+    pkcs7_encrypted_data   [
+        [0] {
+                bags         [
+                    [0] {
+                            bag_attributes   {
+                                2.16.840.1.113894.746875.1.1   "<Unsupported tag 6>",
+                                friendlyName                   "..."
+                            },
+                            cert             "...",
+                            issuer           "...",
+                            subject          "...",
+                            type             "certificate_bag"
+                        },
+                    [1] {
+                            bag_attributes   {
+                                friendlyName   "...",
+                                localKeyID     "..." (dualvar: 54)
+                            },
+                            cert             "...",
+                            issuer           "...",
+                            subject          "...",
+                            type             "certificate_bag"
+                        }
+                ],
+                parameters   {
+                    iteration        10000,
+                    nid_long_name    "PBKDF2",
+                    nid_short_name   "PBKDF2"
+                }
+            }
+    ]
+}
 
 =back
 
