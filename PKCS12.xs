@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_newCONSTSUB
 #include "ppport.h"
 
 #include <openssl/crypto.h>
@@ -349,7 +350,7 @@ int dump_certs_pkeys_bag (pTHX_ BIO *bio, PKCS12_SAFEBAG *bag, const char *pass,
 
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
     case NID_secretBag:
-        //FIXME: Not sure how to test this
+        /*FIXME: Not sure how to test this */
         if (options & INFO) {
           char * attribute_value = NULL;
           if (bag_hv){
@@ -1009,7 +1010,7 @@ new_from_string(class, string)
 
   SvGETMAGIC(string);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-  //FIXME: There should likely be an option for whether to load the legacy provider
+  /*FIXME: There should likely be an option for whether to load the legacy provider */
   legacy = OSSL_PROVIDER_load(NULL, "legacy");
     if (legacy == NULL) {
       croak("Failed to load Legacy provider\n");
