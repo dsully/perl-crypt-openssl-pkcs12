@@ -123,7 +123,7 @@ if ($major eq '1.0') {
   $openssl_output =~ s/MAC: sha1, Iteration 10000/MAC Iteration 10000/g;
   $openssl_output =~ s/MAC length: .*/MAC verified OK/;
 }
-if ($major ge '3.1') {
+if ($major ge '3.2') {
   $openssl_output =~ s/2.16.840.1.113894.746875.1.1/Trusted key usage (Oracle)/g;
 }
 
