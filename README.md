@@ -22,9 +22,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
     # Creating a string
     my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
+    # Reproducing OpenSSL's info
+    my $info = $pkcs12->info($pass);
+
+    # Accessing OpenSSL's info as a hash
+    my $info_hash = $pkcs12->info_as_hash($pass);
+
 # VERSION
 
-This documentation describes version 1.9
+This documentation describes version 1.92
 
 # DESCRIPTION
 
@@ -73,6 +79,130 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
     `$friendly_name` is optional.
 
     Returns a string holding the PKCS12 certicate.
+
+- info( `$pass` )
+
+    Returns a string containing the output of information about the pkcs12 file in
+    the same format as produced by the openssl command:
+
+        openssl pkcs12 -in certs/test_le_1.1.p12 -info -nodes
+
+- info\_as\_hash( `$pass` )
+
+    Places the information about the pkcs12 file, the certificates and keys
+    in a hash.
+
+    The format of the hash is complex to represent the data in the PKCS12 file:
+
+    Essentially, the hash follows the format of the -info output.
+
+    1\. pkcs7\_data and pkcs7\_encrypted\_data are arrays as more than one of each can exist
+    2\. mac provieds the top level mac parameters for the file
+    3\. safe\_contents\_bag is an array that contains an array of bags
+    4\. bags is an array of bags
+    5\. a bag is a container for a key or certificate
+
+    Each bag has a type and the following are available:
+
+    1\. key\_bag
+    2\. certificate\_bag
+    3\. shrouded\_keybag
+    4\. secret\_bag
+    5\. safe\_contents\_bag
+
+    {
+        mac                    {
+            digest        "sha1",
+            iteration     2048,
+            length        20,
+            salt\_length   20
+        },
+        pkcs7\_data             \[
+            \[0\] {
+                    bags   \[
+                        \[0\] {
+                                bag\_attributes   {
+                                    friendlyName   "...",
+                                    localKeyID     "..." (dualvar: 54)
+                                },
+                                key              "...",
+                                key\_attributes   {
+                                    "X509v3 Key Usage"   10
+                                },
+                                parameters       {
+                                    iteration        10000,
+                                    nid\_long\_name    "PBKDF2",
+                                    nid\_short\_name   "PBKDF2"
+                                },
+                                type             "shrouded\_keybag"
+                            }
+                    \]
+                },
+            \[1\] {
+                    safe\_contents\_bag   \[
+                        \[0\] {
+                                bags   \[
+                                    \[0\] {
+                                            bag\_attributes   {
+                                                localKeyID   "01" (dualvar: 1)
+                                                friendlyName   "",
+                                            },
+                                            cert             "...".
+                                            issuer           "...",
+                                            subject          "...",
+                                            type             "certificate\_bag"
+                                            }
+                                \],
+                                type   "safe\_contents\_bag"
+                            }
+                    \]
+                },
+            \[2\] {
+                    bags   \[
+                        \[0\] {
+                                bag\_attributes   {
+                                    localKeyID   "02" (dualvar: 2)
+                                },
+                                cert             "...",
+                                issuer           "...",
+                                subject          "...",
+                                type             "certificate\_bag"
+                            }
+                    \]
+                },
+        \],
+        pkcs7\_encrypted\_data   \[
+            \[0\] {
+                    bags         \[
+                        \[0\] {
+                                bag\_attributes   {
+                                    2.16.840.1.113894.746875.1.1   "<Unsupported tag 6>",
+                                    friendlyName                   "..."
+                                },
+                                cert             "...",
+                                issuer           "...",
+                                subject          "...",
+                                type             "certificate\_bag"
+                            },
+                        \[1\] {
+                                bag\_attributes   {
+                                    friendlyName   "...",
+                                    localKeyID     "..." (dualvar: 54)
+                                },
+                                cert             "...",
+                                issuer           "...",
+                                subject          "...",
+                                type             "certificate\_bag"
+                            }
+                    \],
+                    parameters   {
+                        iteration        10000,
+                        nid\_long\_name    "PBKDF2",
+                        nid\_short\_name   "PBKDF2"
+                    }
+                }
+        \]
+    }
 
 # EXPORTS
 
