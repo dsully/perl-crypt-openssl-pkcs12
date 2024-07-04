@@ -152,11 +152,13 @@ static void sv_bio_error(pTHX_ BIO *bio) {
 SV* extractBioString(pTHX_ BIO* p_stringBio)
 {
      SV* sv;
-     BUF_MEM* bptr;
-
+     char *datap;
+     long datasize = 0;
+ 
      CHECK_OPEN_SSL(BIO_flush(p_stringBio) == 1);
-     BIO_get_mem_ptr(p_stringBio, &bptr);
-     sv = newSVpv(bptr->data, bptr->length);
+
+     datasize = BIO_get_mem_data(p_stringBio, &datap);
+     sv = newSVpv(datap, datasize);
 
      CHECK_OPEN_SSL(BIO_set_close(p_stringBio, BIO_CLOSE) == 1);
      BIO_free(p_stringBio);
