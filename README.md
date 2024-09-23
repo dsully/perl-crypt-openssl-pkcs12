@@ -41,6 +41,10 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 # SUBROUTINES/METHODS
 
 - new( )
+- legacy\_support ( )
+
+    Check whether the openssl version installed supports the legacy provider.
+
 - new\_from\_string( `$string` )
 - new\_from\_file( `$filename` )
 
