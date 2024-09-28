@@ -71,6 +71,10 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
 =item * new( )
 
+=item * legacy_support ( )
+
+Check whether the openssl version installed supports the legacy provider.
+
 =item * new_from_string( C<$string> )
 
 =item * new_from_file( C<$filename> )
