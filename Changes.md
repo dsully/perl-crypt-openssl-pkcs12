@@ -3,6 +3,9 @@
 # 1.93 2024-09-28
 
 - Inclusion of PR: [#51](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/44) aimed at addressing the following issues observed with previous release: `1.92`, thanks to @timlegge for the contribution
+  - [#48](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/48)
+  - [#49](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/49)
+  - [#40](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/50)
 
 # 1.92 2024-09-08
 
