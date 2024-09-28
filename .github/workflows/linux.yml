@@ -31,9 +31,9 @@ jobs:
     container:
       image: perl:${{ matrix.perl-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.0
       - name: uses install-with-cpanm
-        uses: perl-actions/install-with-cpanm@v1.5
+        uses: perl-actions/install-with-cpanm@v1.7
         with:
           cpanfile: "cpanfile"
           sudo: false

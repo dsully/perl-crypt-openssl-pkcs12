@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.0
       # REF: https://github.com/actions/runner-images/tree/main/images/macos
       # See link above, at the time of writing we get Perl 5.36.1 with macOS 13.5.1)
       - name: Set up Perl
