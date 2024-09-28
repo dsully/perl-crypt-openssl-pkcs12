@@ -30,7 +30,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 # VERSION
 
-This documentation describes version 1.92
+This documentation describes version 1.93 of Crypt::OpenSSL::PKCS12
 
 # DESCRIPTION
 
