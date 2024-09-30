@@ -54,6 +54,10 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
     Get the Base64 representation of the certificate.
 
+- ca\_certificate( \[`$pass`\] )
+
+    Get the Base64 representation of the CA certificate chain.
+
 - private\_key( \[`$pass`\] )
 
     Get the Base64 representation of the private key.
