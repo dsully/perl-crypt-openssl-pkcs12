@@ -85,6 +85,10 @@ Create a new Crypt::OpenSSL::PKCS12 instance.
 
 Get the Base64 representation of the certificate.
 
+=item * ca_certificate( [C<$pass>] )
+
+Get the Base64 representation of the CA certificate chain.
+
 =item * private_key( [C<$pass>] )
 
 Get the Base64 representation of the private key.
