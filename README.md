@@ -277,6 +277,7 @@ In alphabetical order, contributors, bug reporters and all
 - Daisuke Murase, @typester
 - Darko Prelec, @dprelec
 - David Steinbrunner, @dsteinbrunner
+- Gianni Ceccarelli, @dakkar
 - Giuseppe Di Terlizzi, @giterlizzi
 - H.Merijn Brand, @tux
 - Hakim, @osfameron
