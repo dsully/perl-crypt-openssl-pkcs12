@@ -1133,7 +1133,7 @@ mac_ok(pkcs12, pwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }
@@ -1157,13 +1157,13 @@ changepass(pkcs12, oldpwd = &PL_sv_undef, newpwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(oldpwd)) {
-    oldpwd_str = SvPVbyte(oldpwd, oldpwd_len);
+    oldpwd_str = SvPV(oldpwd, oldpwd_len);
     if (memchr(oldpwd_str, '\0', oldpwd_len) != NULL)
       croak("old PKCS12 password contains embedded NUL byte; "
             "PKCS12_newpass() uses strlen() and would silently truncate it");
   }
   if (SvOK(newpwd)) {
-    newpwd_str = SvPVbyte(newpwd, newpwd_len);
+    newpwd_str = SvPV(newpwd, newpwd_len);
     if (memchr(newpwd_str, '\0', newpwd_len) != NULL)
       croak("new PKCS12 password contains embedded NUL byte; "
             "PKCS12_newpass() uses strlen() and would silently truncate it");
@@ -1198,7 +1198,7 @@ create(pkcs12, cert_chain_pem = "", pk = "", pass = &PL_sv_undef, file = 0, name
   CODE:
 
   if (SvOK(pass)) {
-    pass_str = SvPVbyte(pass, pass_len);
+    pass_str = SvPV(pass, pass_len);
     if (memchr(pass_str, '\0', pass_len) != NULL)
       croak("PKCS12 password contains embedded NUL byte; "
             "PKCS12_create() uses strlen() and would silently truncate it");
@@ -1246,7 +1246,7 @@ create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = &PL_sv_undef, name
   CODE:
 
   if (SvOK(pass)) {
-    pass_str = SvPVbyte(pass, pass_len);
+    pass_str = SvPV(pass, pass_len);
     if (memchr(pass_str, '\0', pass_len) != NULL)
       croak("PKCS12 password contains embedded NUL byte; "
             "PKCS12_create() uses strlen() and would silently truncate it");
@@ -1284,7 +1284,7 @@ certificate(pkcs12, pwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }
@@ -1315,7 +1315,7 @@ ca_certificate(pkcs12, pwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }
@@ -1345,7 +1345,7 @@ private_key(pkcs12, pwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }
@@ -1382,7 +1382,7 @@ HV* info_as_hash(pkcs12, pwd = &PL_sv_undef)
 
   CODE:
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }
@@ -1462,7 +1462,7 @@ info(pkcs12, pwd = &PL_sv_undef)
   CODE:
 
   if (SvOK(pwd)) {
-    pwd_str = SvPVbyte(pwd, pwd_len);
+    pwd_str = SvPV(pwd, pwd_len);
     if (pwd_len > (STRLEN)INT_MAX)
       croak("password length exceeds INT_MAX");
   }

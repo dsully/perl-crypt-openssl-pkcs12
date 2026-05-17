@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use File::Spec::Functions qw(:ALL);
 use Crypt::OpenSSL::Guess;
 
@@ -69,4 +69,14 @@ ok($pkcs12->mac_ok($pass), 'mac_ok returns true for correct password');
         eval { $pkcs12->changepass($pass, $nul_pass) };
         like($@, qr/embedded NUL/i, 'changepass() croaks for NUL-containing new password');
     }
+}
+
+# Regression guard for CVE-2026-8721 fix: SvPV (not SvPVbyte) must be used so
+# that UTF-8 strings with codepoints > 255 reach OpenSSL without croaking.
+# OpenSSL's PKCS12 code handles the UTF-8 -> UTF-16 BMPString conversion itself.
+{
+    my $wide_pass = "\x{65E5}\x{672C}\x{8A9E}"; # 日本語
+    my $result = eval { $pkcs12->mac_ok($wide_pass) };
+    is($@, '', 'mac_ok with wide-char (codepoint > 255) password does not croak');
+    ok(!$result, 'mac_ok returns false (not croak) for wide-char password');
 }
