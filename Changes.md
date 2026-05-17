@@ -1,5 +1,16 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.95 (unreleased)
+
+- Security: fix CVE-2026-8507 — integer overflow to heap out-of-bounds write in
+  `print_attribute`. `ASN1_STRING.length` is declared `int`; multiplying by 4
+  before casting to `size_t` overflows at length `0x40000000`, producing a
+  near-zero allocation while `get_hex` writes ~3 GiB past it. Affected cases:
+  `V_ASN1_OCTET_STRING` and `V_ASN1_BIT_STRING` attributes on a SAFEBAG,
+  reachable via the public `info()` and `info_as_hash()` API with an
+  attacker-supplied PKCS12 file. Lengths outside `[0, INT_MAX/4]` now croak
+  explicitly. CWE-787 / CWE-190.
+
 # 1.94 2024-10-01
 
 - Merge of PR: [#52](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/52) from @dakkar, first time contributor to the distribution, thanks for the contribution
