@@ -10,6 +10,7 @@
   reachable via the public `info()` and `info_as_hash()` API with an
   attacker-supplied PKCS12 file. Lengths outside `[0, INT_MAX/4]` now croak
   explicitly. CWE-787 / CWE-190.
+  Regression test added in `t/pkcs12-info-cve-2026-8507.t`.
 
 # 1.94 2024-10-01
 
