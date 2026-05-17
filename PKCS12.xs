@@ -679,7 +679,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
 
   case V_ASN1_OCTET_STRING:
     if(*attribute != NULL) {
-      Renew(*attribute, av->value.octet_string->length * 4, char);
+      if (av->value.octet_string->length < 0 ||
+          av->value.octet_string->length > INT_MAX / 4)
+        croak("OCTET STRING attribute length out of range (got %d)",
+              av->value.octet_string->length);
+      Renew(*attribute, (size_t)av->value.octet_string->length * 4, char);
       get_hex(*attribute, av->value.octet_string->data, av->value.octet_string->length);
     } else {
       hex_prin(out, av->value.octet_string->data,
@@ -690,7 +694,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
 
   case V_ASN1_BIT_STRING:
     if(*attribute != NULL) {
-      Renew(*attribute, av->value.bit_string->length *4, char);
+      if (av->value.bit_string->length < 0 ||
+          av->value.bit_string->length > INT_MAX / 4)
+        croak("BIT STRING attribute length out of range (got %d)",
+              av->value.bit_string->length);
+      Renew(*attribute, (size_t)av->value.bit_string->length * 4, char);
       get_hex(*attribute, av->value.bit_string->data, av->value.bit_string->length);
     } else {
       hex_prin(out, av->value.bit_string->data,
