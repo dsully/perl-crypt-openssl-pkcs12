@@ -1,16 +1,20 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-# 1.95 (unreleased)
+# 1.95 TBD
 
-- Security: fix CVE-2026-8507 — integer overflow to heap out-of-bounds write in
-  `print_attribute`. `ASN1_STRING.length` is declared `int`; multiplying by 4
-  before casting to `size_t` overflows at length `0x40000000`, producing a
-  near-zero allocation while `get_hex` writes ~3 GiB past it. Affected cases:
-  `V_ASN1_OCTET_STRING` and `V_ASN1_BIT_STRING` attributes on a SAFEBAG,
-  reachable via the public `info()` and `info_as_hash()` API with an
-  attacker-supplied PKCS12 file. Lengths outside `[0, INT_MAX/4]` now croak
-  explicitly. CWE-787 / CWE-190.
-  Regression test added in `t/pkcs12-info-cve-2026-8507.t`.
+- Security: fix CVE-2026-8507 — integer overflow in `print_attribute` leading to
+  heap out-of-bounds write when an OCTET STRING or BIT STRING attribute length
+  overflows `int * 4`. Lengths > `INT_MAX/4` now croak explicitly.
+
+- Security (CVE-2026-8721): length-aware password handling across all XS entry points.
+  Passwords are now extracted with `SvPV` (preserving the full Perl string length)
+  rather than relying on `strlen`. APIs that accept an explicit length
+  (`PKCS12_verify_mac`, `dump_certs_keys_p12`) receive the true byte count;
+  APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
+  croak with a clear diagnostic if the password contains an embedded NUL byte.
+
+- Fix: `mac_ok` now returns false for a wrong password instead of croaking,
+  matching the documented semantics of the method.
 
 # 1.94 2024-10-01
 
