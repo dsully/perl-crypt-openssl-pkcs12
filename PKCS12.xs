@@ -452,7 +452,7 @@ int dump_certs_pkeys_bags(pTHX_ BIO *bio, CONST_STACK_OF(PKCS12_SAFEBAG) *bags, 
   return 1;
 }
 
-int dump_certs_keys_p12(pTHX_ BIO *bio, PKCS12 *p12, char *pass, int passlen, int options, char *pempass, HV * orig_hash) {
+int dump_certs_keys_p12(pTHX_ BIO *bio, PKCS12 *p12, const char *pass, int passlen, int options, char *pempass, HV * orig_hash) {
 
   STACK_OF(PKCS7) *asafes;
   STACK_OF(PKCS12_SAFEBAG) *bags;
