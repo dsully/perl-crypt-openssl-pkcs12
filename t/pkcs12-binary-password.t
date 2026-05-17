@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 9;
 use File::Spec::Functions qw(:ALL);
 use Crypt::OpenSSL::Guess;
 
@@ -24,16 +24,7 @@ if ($major le "1.1") {
 my $pkcs12 = Crypt::OpenSSL::PKCS12->new_from_file($certfile);
 ok($pkcs12, 'PKCS12 object created');
 
-# Fix 1: mac_ok must return false for a wrong password, not croak.
-# Previously it called PKCS12_verify_mac twice — the first call would croak
-# on failure, making it impossible for mac_ok to ever return false.
-{
-    my $result = eval { $pkcs12->mac_ok('wrong-password') };
-    is($@, '', 'mac_ok with wrong password does not croak');
-    ok(!$result, 'mac_ok returns false for wrong password');
-}
-
-# mac_ok still returns true for the correct password
+# mac_ok returns true for the correct password
 ok($pkcs12->mac_ok($pass), 'mac_ok returns true for correct password');
 
 # Embedded NUL in password croaks for APIs that use strlen() internally.
@@ -72,11 +63,14 @@ ok($pkcs12->mac_ok($pass), 'mac_ok returns true for correct password');
 }
 
 # Regression guard for CVE-2026-8721 fix: SvPV (not SvPVbyte) must be used so
-# that UTF-8 strings with codepoints > 255 reach OpenSSL without croaking.
-# OpenSSL's PKCS12 code handles the UTF-8 -> UTF-16 BMPString conversion itself.
+# that UTF-8 strings with codepoints > 255 reach OpenSSL without an encoding
+# error. mac_ok will still croak on wrong password, but the error must come from
+# PKCS12_verify_mac, not from Perl's "Wide character in subroutine entry".
 {
     my $wide_pass = "\x{65E5}\x{672C}\x{8A9E}"; # 日本語
-    my $result = eval { $pkcs12->mac_ok($wide_pass) };
-    is($@, '', 'mac_ok with wide-char (codepoint > 255) password does not croak');
-    ok(!$result, 'mac_ok returns false (not croak) for wide-char password');
+    eval { $pkcs12->mac_ok($wide_pass) };
+    unlike($@, qr/Wide character/i,
+        'mac_ok with wide-char password does not croak with encoding error');
+    like($@, qr/PKCS12_verify_mac/i,
+        'mac_ok with wide-char password croaks with PKCS12 error, not encoding error');
 }

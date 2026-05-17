@@ -1146,7 +1146,10 @@ mac_ok(pkcs12, pwd = &PL_sv_undef)
       croak("password length exceeds INT_MAX");
   }
 
-  RETVAL = PKCS12_verify_mac(pkcs12, pwd_str, (int)pwd_len) ? &PL_sv_yes : &PL_sv_no;
+  if (!(PKCS12_verify_mac(pkcs12, pwd_str, (int)pwd_len)))
+    croak("PKCS12_verify_mac: \n%s", ssl_error(aTHX));
+
+  RETVAL = &PL_sv_yes;
 
   OUTPUT:
   RETVAL

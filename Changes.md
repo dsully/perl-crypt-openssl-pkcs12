@@ -1,6 +1,6 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-# 1.95 TBD
+# 1.95 2026-05-17, security release, update recommended
 
 - Security: fix CVE-2026-8507 — integer overflow in `print_attribute` leading to
   heap out-of-bounds write when an OCTET STRING or BIT STRING attribute length
@@ -12,9 +12,6 @@
   (`PKCS12_verify_mac`, `dump_certs_keys_p12`) receive the true byte count;
   APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
   croak with a clear diagnostic if the password contains an embedded NUL byte.
-
-- Fix: `mac_ok` now returns false for a wrong password instead of croaking,
-  matching the documented semantics of the method.
 
 # 1.94 2024-10-01
 
