@@ -13,6 +13,8 @@
   APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
   croak with a clear diagnostic if the password contains an embedded NUL byte.
 
+  Thanks to the CPANsec team for reporting and assisting with these issues: https://security.metacpan.org
+
 # 1.94 2024-10-01
 
 - Merge of PR: [#52](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/52) from @dakkar, first time contributor to the distribution, thanks for the contribution
