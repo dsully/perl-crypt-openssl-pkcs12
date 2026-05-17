@@ -1,5 +1,27 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.95 TBD
+
+- Security: fix CVE-2026-8507 — integer overflow in `print_attribute` leading to
+  heap out-of-bounds write when an OCTET STRING or BIT STRING attribute length
+  overflows `int * 4`. Lengths > `INT_MAX/4` now croak explicitly.
+
+- Security: length-aware password handling across all XS entry points. Passwords
+  are now extracted with `SvPVbyte` (preserving the full Perl string length)
+  rather than relying on `strlen`. APIs that accept an explicit length
+  (`PKCS12_verify_mac`, `dump_certs_keys_p12`) receive the true byte count;
+  APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
+  croak with a clear diagnostic if the password contains an embedded NUL byte.
+
+  **Behaviour change**: passwords passed as Perl UTF-8 strings containing
+  characters outside the Latin-1 range (codepoints > 255) will now croak
+  with `"Wide character in subroutine entry"`. Previously, the raw UTF-8
+  encoding was silently passed to OpenSSL. Callers must encode passwords to
+  bytes before passing them (e.g. `use Encode; encode('UTF-8', $pwd)`).
+
+- Fix: `mac_ok` now returns false for a wrong password instead of croaking,
+  matching the documented semantics of the method.
+
 # 1.94 2024-10-01
 
 - Merge of PR: [#52](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/52) from @dakkar, first time contributor to the distribution, thanks for the contribution
