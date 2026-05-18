@@ -2,18 +2,18 @@
 
 # 1.95 2026-05-17, security release, update recommended
 
-- Security: fix CVE-2026-8507 — integer overflow in `print_attribute` leading to
+- Security: fix [CVE-2026-8507](https://www.cve.org/CVERecord?id=CVE-2026-8507) — integer overflow in `print_attribute` leading to
   heap out-of-bounds write when an OCTET STRING or BIT STRING attribute length
   overflows `int * 4`. Lengths > `INT_MAX/4` now croak explicitly.
 
-- Security (CVE-2026-8721): length-aware password handling across all XS entry points.
+- Security ([CVE-2026-8721](https://www.cve.org/CVERecord?id=CVE-2026-8721)): length-aware password handling across all XS entry points.
   Passwords are now extracted with `SvPV` (preserving the full Perl string length)
   rather than relying on `strlen`. APIs that accept an explicit length
   (`PKCS12_verify_mac`, `dump_certs_keys_p12`) receive the true byte count;
   APIs that use `strlen` internally (`PKCS12_create`, `PKCS12_newpass`) now
   croak with a clear diagnostic if the password contains an embedded NUL byte.
 
-  Thanks to the CPANsec team for reporting and assisting with these issues: https://security.metacpan.org
+  Thanks to the [CPANsec team](https://security.metacpan.org) for reporting and assisting with these issues.
 
 # 1.94 2024-10-01
 
