@@ -658,6 +658,8 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
   switch (av->type) {
   case V_ASN1_BMPSTRING:
     length = av->value.bmpstring->length;
+    if (length < 0 || length > (INT_MAX - 1))
+      croak("BMPSTRING attribute length out of range (got %d)", length);
     value = OPENSSL_uni2asc(av->value.bmpstring->data, length);
     if(*attribute != NULL) {
       Renew(*attribute, length, char);
