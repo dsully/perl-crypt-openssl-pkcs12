@@ -676,7 +676,8 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
       if (length < 0 || length > (INT_MAX - 1))
         croak("UTF8STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length + 1, char);
-      strncpy(*attribute, (const char * ) av->value.utf8string->data, length);
+      if (length)
+        memcpy(*attribute, av->value.utf8string->data, (size_t)length);
       (*attribute)[length] = '\0';
     } else {
       BIO_printf(out, "%.*s\n", length, av->value.utf8string->data);
