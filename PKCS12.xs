@@ -666,8 +666,8 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
       strncpy(*attribute, value, length);
     } else {
       BIO_printf(out, "%s\n", value);
-      OPENSSL_free(value);
     }
+    OPENSSL_free(value);
     break;
 
   case V_ASN1_UTF8STRING:
