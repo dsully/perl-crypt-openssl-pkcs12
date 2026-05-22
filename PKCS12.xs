@@ -650,17 +650,18 @@ void hex_prin(BIO *out, unsigned char *buf, int len)
 void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
 {
   char *value;
+  int length = 0;
   /*
   const char *ln;
   char objbuf[80];
   */
   switch (av->type) {
   case V_ASN1_BMPSTRING:
-    value = OPENSSL_uni2asc(av->value.bmpstring->data,
-                                av->value.bmpstring->length);
+    length = av->value.bmpstring->length;
+    value = OPENSSL_uni2asc(av->value.bmpstring->data, length);
     if(*attribute != NULL) {
-      Renew(*attribute, av->value.bmpstring->length, char);
-      strncpy(*attribute, value, av->value.bmpstring->length);
+      Renew(*attribute, length, char);
+      strncpy(*attribute, value, length);
     } else {
       BIO_printf(out, "%s\n", value);
       OPENSSL_free(value);
@@ -668,44 +669,40 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     break;
 
   case V_ASN1_UTF8STRING:
+    length = av->value.utf8string->length;
     if(*attribute != NULL) {
-      if (av->value.utf8string->length < 0 || av->value.utf8string->length > (INT_MAX - 1))
-        croak("UTF8STRING attribute length out of range (got %d)", av->value.utf8string->length);
-      Renew(*attribute, (size_t)av->value.utf8string->length + 1, char);
-      strncpy(*attribute, (const char * ) av->value.utf8string->data, av->value.utf8string->length);
-      (*attribute)[av->value.utf8string->length] = '\0';
+      if (length < 0 || length > (INT_MAX - 1))
+        croak("UTF8STRING attribute length out of range (got %d)", length);
+      Renew(*attribute, (size_t)length + 1, char);
+      strncpy(*attribute, (const char * ) av->value.utf8string->data, length);
+      (*attribute)[length] = '\0';
     } else {
-      BIO_printf(out, "%.*s\n", av->value.utf8string->length,
-                   av->value.utf8string->data);
+      BIO_printf(out, "%.*s\n", length, av->value.utf8string->data);
     }
     break;
 
   case V_ASN1_OCTET_STRING:
+    length = av->value.octet_string->length;
     if(*attribute != NULL) {
-      if (av->value.octet_string->length < 0 ||
-          av->value.octet_string->length > INT_MAX / 4)
-        croak("OCTET STRING attribute length out of range (got %d)",
-              av->value.octet_string->length);
-      Renew(*attribute, (size_t)av->value.octet_string->length * 4, char);
-      get_hex(*attribute, av->value.octet_string->data, av->value.octet_string->length);
+      if (length < 0 || length > INT_MAX / 4)
+        croak("OCTET STRING attribute length out of range (got %d)", length);
+      Renew(*attribute, (size_t)length * 4, char);
+      get_hex(*attribute, av->value.octet_string->data, length);
     } else {
-      hex_prin(out, av->value.octet_string->data,
-                 av->value.octet_string->length);
+      hex_prin(out, av->value.octet_string->data, length);
       BIO_printf(out, "\n");
     }
     break;
 
   case V_ASN1_BIT_STRING:
+    length = av->value.bit_string->length;
     if(*attribute != NULL) {
-      if (av->value.bit_string->length < 0 ||
-          av->value.bit_string->length > INT_MAX / 4)
-        croak("BIT STRING attribute length out of range (got %d)",
-              av->value.bit_string->length);
-      Renew(*attribute, (size_t)av->value.bit_string->length * 4, char);
-      get_hex(*attribute, av->value.bit_string->data, av->value.bit_string->length);
+      if (length < 0 || length > INT_MAX / 4)
+        croak("BIT STRING attribute length out of range (got %d)", length);
+      Renew(*attribute, (size_t)length * 4, char);
+      get_hex(*attribute, av->value.bit_string->data, length);
     } else {
-      hex_prin(out, av->value.bit_string->data,
-                 av->value.bit_string->length);
+      hex_prin(out, av->value.bit_string->data, length);
       BIO_printf(out, "\n");
     }
     break;
