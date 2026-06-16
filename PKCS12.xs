@@ -840,7 +840,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
                 croak("unable to add MAC to the hash");
             }
 
-            BIO_set_close(attr_bio, BIO_CLOSE);
+            (void)BIO_set_close(attr_bio, BIO_CLOSE);
             BIO_free(attr_bio);
           }
           Safefree(attribute_value);
