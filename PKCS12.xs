@@ -42,6 +42,7 @@ OSSL_PROVIDER *deflt    = NULL;
 #define CONST_ASN1_OBJECT ASN1_OBJECT
 #define CONST_ASN1_OCTET_STRING ASN1_OCTET_STRING
 #define CONST_VOID void
+#define ASN1_STRING_get0_data(x) ((const unsigned char *)ASN1_STRING_data(x))
 #else
 #define CONST_PKCS8_PRIV_KEY_INFO const PKCS8_PRIV_KEY_INFO
 #define CONST_X509_ALGOR const X509_ALGOR
