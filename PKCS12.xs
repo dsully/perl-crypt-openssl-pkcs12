@@ -826,20 +826,21 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
             }
           } else {
             BIO *attr_bio;
-            BUF_MEM* bptr;
+            char *attr_key = NULL;
+            long attr_key_len;
 
             CHECK_OPEN_SSL(attr_bio = BIO_new(BIO_s_mem()));
             i2a_ASN1_OBJECT(attr_bio, attr_obj);
 
             CHECK_OPEN_SSL(BIO_flush(attr_bio) == 1);
-            BIO_get_mem_ptr(attr_bio, &bptr);
+            attr_key_len = BIO_get_mem_data(attr_bio, &attr_key);
 
-            if (bptr->length > 0) {
-              if((hv_store(bag_hv,  bptr->data, bptr->length, newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
+            if (attr_key_len > 0) {
+              if((hv_store(bag_hv, attr_key, (I32)attr_key_len, newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
                 croak("unable to add MAC to the hash");
             }
 
-            CHECK_OPEN_SSL(BIO_set_close(attr_bio, BIO_CLOSE) == 1);
+            BIO_set_close(attr_bio, BIO_CLOSE);
             BIO_free(attr_bio);
           }
           Safefree(attribute_value);
