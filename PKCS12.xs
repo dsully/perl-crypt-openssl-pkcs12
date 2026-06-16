@@ -663,10 +663,10 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
   */
   switch (av->type) {
   case V_ASN1_BMPSTRING:
-    length = av->value.bmpstring->length;
+    length = ASN1_STRING_length(av->value.bmpstring);
     if (length < 0 || length > (INT_MAX - 1))
       croak("BMPSTRING attribute length out of range (got %d)", length);
-    value = OPENSSL_uni2asc(av->value.bmpstring->data, length);
+    value = OPENSSL_uni2asc(ASN1_STRING_get0_data(av->value.bmpstring), length);
     /* Defensive: OPENSSL_uni2asc returns NULL on allocation failure, and on
        an odd-length BMPSTRING. Guard before either branch dereferences it:
        the else branch below passes value to BIO_printf. */
@@ -691,41 +691,41 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
     break;
 
   case V_ASN1_UTF8STRING:
-    length = av->value.utf8string->length;
+    length = ASN1_STRING_length(av->value.utf8string);
     if(*attribute != NULL) {
       if (length < 0 || length > (INT_MAX - 1))
         croak("UTF8STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length + 1, char);
       if (length)
-        memcpy(*attribute, av->value.utf8string->data, (size_t)length);
+        memcpy(*attribute, ASN1_STRING_get0_data(av->value.utf8string), (size_t)length);
       (*attribute)[length] = '\0';
     } else {
-      BIO_printf(out, "%.*s\n", length, av->value.utf8string->data);
+      BIO_printf(out, "%.*s\n", length, ASN1_STRING_get0_data(av->value.utf8string));
     }
     break;
 
   case V_ASN1_OCTET_STRING:
-    length = av->value.octet_string->length;
+    length = ASN1_STRING_length(av->value.octet_string);
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("OCTET STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, av->value.octet_string->data, length);
+      get_hex(*attribute, (unsigned char *)ASN1_STRING_get0_data(av->value.octet_string), length);
     } else {
-      hex_prin(out, av->value.octet_string->data, length);
+      hex_prin(out, (unsigned char *)ASN1_STRING_get0_data(av->value.octet_string), length);
       BIO_printf(out, "\n");
     }
     break;
 
   case V_ASN1_BIT_STRING:
-    length = av->value.bit_string->length;
+    length = ASN1_STRING_length(av->value.bit_string);
     if(*attribute != NULL) {
       if (length < 0 || length > INT_MAX / 4)
         croak("BIT STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, av->value.bit_string->data, length);
+      get_hex(*attribute, (unsigned char *)ASN1_STRING_get0_data(av->value.bit_string), length);
     } else {
-      hex_prin(out, av->value.bit_string->data, length);
+      hex_prin(out, (unsigned char *)ASN1_STRING_get0_data(av->value.bit_string), length);
       BIO_printf(out, "\n");
     }
     break;
