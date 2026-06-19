@@ -14,9 +14,9 @@ Run through the release checklist for this distribution. Check each step and rep
    perl Makefile.PL && make && prove -lr -l -b t
    ```
 
-4. **Author tests** — run with strict compiler warnings enabled:
+4. **Author and Release tests** — run with strict compiler warnings enabled:
    ```
-   AUTHOR_TESTING=1 perl Makefile.PL && make
+   AUTHOR_TESTING=1 RELEASE_TESTING=1 carton exec -- dzil test
    ```
 
 5. **Dist build** — build the distribution tarball via Dist::Zilla:
@@ -32,7 +32,7 @@ Run through the release checklist for this distribution. Check each step and rep
 
 7. **Upload** — upload to CPAN:
    ```
-   dzil release
+   carton exec -- dzil release
    ```
    or manually via `cpan-upload Crypt-OpenSSL-PKCS12-<VERSION>.tar.gz`.
 
