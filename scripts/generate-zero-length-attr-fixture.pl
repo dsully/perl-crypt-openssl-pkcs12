@@ -4,6 +4,28 @@ use warnings;
 use MIME::Base64 qw(decode_base64);
 use Convert::ASN1;
 
+# ── DER encoding helpers ────────────────────────────────────────────────────────
+sub _der_length {
+    my ($len) = @_;
+    if ($len < 128) {
+        return chr($len);
+    } else {
+        my @bytes;
+        while ($len > 0) {
+            unshift @bytes, chr($len & 0xFF);
+            $len >>= 8;
+        }
+        return chr(0x80 | scalar(@bytes)) . join('', @bytes);
+    }
+}
+
+sub _encode_sequence_of {
+    my ($items) = @_;
+    my $content = join('', @$items);
+    my $len_der = _der_length(length($content));
+    return "\x30" . $len_der . $content;  # 0x30 = SEQUENCE tag
+}
+
 # ── OIDs ────────────────────────────────────────────────────────────────────
 my $OID_PKCS7_DATA   = '1.2.840.113549.1.7.1';
 my $OID_CERT_BAG     = '1.2.840.113549.1.12.10.1.3';
@@ -114,10 +136,10 @@ my $inner_ci_der = $ci_asn->encode({
 }) or die $ci_asn->error;
 
 # Step 3: build the SEQUENCE OF ContentInfo (AuthSafeContents)
-my $auth_safe_seq_der = $auth_safe_ci_asn->encode([ {
-    contentType => $OID_PKCS7_DATA,
-    content     => $octet_sc,
-} ]) or die $auth_safe_ci_asn->error;
+# Use the pre-encoded ContentInfo and manually build the SEQUENCE OF to avoid
+# potential Convert::ASN1 nesting issues.
+my $auth_safe_seq_der = _encode_sequence_of([$inner_ci_der])
+    or die "Cannot encode AuthSafeContents";
 
 # Step 4: wrap that SEQUENCE in an OCTET STRING for the outer PFX ContentInfo
 my $octet_auth_safe = $octet_asn->encode($auth_safe_seq_der)
