@@ -30,7 +30,6 @@ sub _encode_sequence_of {
 my $OID_PKCS7_DATA   = '1.2.840.113549.1.7.1';
 my $OID_CERT_BAG     = '1.2.840.113549.1.12.10.1.3';
 my $OID_X509_CERT    = '1.2.840.113549.1.9.22.1';
-my $OID_HMAC_SHA256  = '1.2.840.113549.2.9';
 my $OID_SHA256       = '2.16.840.1.101.3.4.2.1';
 my $OID_ZERO_OCTET   = '1.2.3.100';
 my $OID_ZERO_BIT     = '1.2.3.101';
@@ -102,9 +101,14 @@ my $octet_asn;
 }
 
 # ── Build certificate bag value (CertBag) ───────────────────────────────────
+# certValue must be an OCTET STRING wrapping the DER-encoded certificate,
+# not raw DER bytes — PKCS12_unpack_p7data() expects the OCTET STRING tag.
+my $cert_octet = $octet_asn->encode($cert_der)
+    or die "Cannot encode cert OCTET STRING: " . $octet_asn->error;
+
 my $certbag_der = $certbag_asn->encode({
     certId    => $OID_X509_CERT,
-    certValue => $cert_der,
+    certValue => $cert_octet,
 }) or die $certbag_asn->error;
 
 # ── Build SafeContents ────────────────────────────────────────────────────────
