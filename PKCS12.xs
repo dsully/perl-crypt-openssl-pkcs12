@@ -63,7 +63,7 @@ int dump_certs_pkeys_bags(pTHX_ BIO *out, CONST_STACK_OF(PKCS12_SAFEBAG) *bags,
 static int alg_print(pTHX_ BIO *bio, CONST_X509_ALGOR *alg, HV* hash);
 void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **value);
 int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst, const char *name, HV *hash);
-void hex_prin(BIO *out, unsigned char *buf, int len);
+void hex_prin(BIO *out, const unsigned char *buf, int len);
 void dump_cert_text(BIO *out, X509 *x);
 SV * get_cert_subject_name(pTHX_ X509 *x);
 SV * get_cert_issuer_name(pTHX_ X509 *x);
@@ -632,7 +632,7 @@ SV * get_cert_issuer_name(pTHX_ X509 *x)
   return sv;
 }
 
-void get_hex(char *out, unsigned char *buf, int len)
+void get_hex(char *out, const unsigned char *buf, int len)
 {
   int i;
   for (i = 0; i < len; i++) {
@@ -644,7 +644,7 @@ void get_hex(char *out, unsigned char *buf, int len)
   *out = '\0';
 }
 
-void hex_prin(BIO *out, unsigned char *buf, int len)
+void hex_prin(BIO *out, const unsigned char *buf, int len)
 {
   int i;
   for (i = 0; i < len; i++)
@@ -700,7 +700,7 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
         memcpy(*attribute, ASN1_STRING_get0_data(av->value.utf8string), (size_t)length);
       (*attribute)[length] = '\0';
     } else {
-      BIO_printf(out, "%.*s\n", length, ASN1_STRING_get0_data(av->value.utf8string));
+      BIO_printf(out, "%.*s\n", length, (const char *)ASN1_STRING_get0_data(av->value.utf8string));
     }
     break;
 
@@ -710,9 +710,9 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
       if (length < 0 || length > INT_MAX / 4)
         croak("OCTET STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, (unsigned char *)ASN1_STRING_get0_data(av->value.octet_string), length);
+      get_hex(*attribute, ASN1_STRING_get0_data(av->value.octet_string), length);
     } else {
-      hex_prin(out, (unsigned char *)ASN1_STRING_get0_data(av->value.octet_string), length);
+      hex_prin(out, ASN1_STRING_get0_data(av->value.octet_string), length);
       BIO_printf(out, "\n");
     }
     break;
@@ -723,9 +723,9 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
       if (length < 0 || length > INT_MAX / 4)
         croak("BIT STRING attribute length out of range (got %d)", length);
       Renew(*attribute, (size_t)length * 4 + 1, char);
-      get_hex(*attribute, (unsigned char *)ASN1_STRING_get0_data(av->value.bit_string), length);
+      get_hex(*attribute, ASN1_STRING_get0_data(av->value.bit_string), length);
     } else {
-      hex_prin(out, (unsigned char *)ASN1_STRING_get0_data(av->value.bit_string), length);
+      hex_prin(out, ASN1_STRING_get0_data(av->value.bit_string), length);
       BIO_printf(out, "\n");
     }
     break;
@@ -822,7 +822,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
             attribute_id = OBJ_nid2ln(attr_nid);
             if (attribute_id) {
               if((hv_store(bag_hv, attribute_id, strlen(attribute_id), newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
-                croak("unable to add MAC to the hash");
+                croak("unable to store attribute in hash");
             }
           } else {
             BIO *attr_bio;
@@ -837,7 +837,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
 
             if (attr_key_len > 0) {
               if((hv_store(bag_hv, attr_key, (I32)attr_key_len, newSVpvn(attribute_value, strlen(attribute_value)), 0)) == NULL)
-                croak("unable to add MAC to the hash");
+                croak("unable to store attribute in hash");
             }
 
             (void)BIO_set_close(attr_bio, BIO_CLOSE);
