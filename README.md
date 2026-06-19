@@ -246,6 +246,7 @@ This distribution has the following dependencies
 - [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt::OpenSSL::RSA)
 - [Crypt::OpenSSL::Bignum](https://metacpan.org/pod/Crypt::OpenSSL::Bignum)
 - [OpenSSL.org](https://www.openssl.org/)
+- [Wikipedia: OpenSSL](https://en.wikipedia.org/wiki/OpenSSL)
 - [Wikipedia: PKCS12](https://en.wikipedia.org/wiki/PKCS_12)
 - [RFC:7292: "PKCS #12: Personal Information Exchange Syntax v1.1"](https://datatracker.ietf.org/doc/html/rfc7292)
 
@@ -296,7 +297,7 @@ In alphabetical order, contributors, bug reporters and all
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2004-2024 by Dan Sully
+Copyright 2004 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

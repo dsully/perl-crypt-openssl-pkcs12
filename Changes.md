@@ -1,5 +1,19 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.96 2026-06-19, security release, update recommended
+
+- Security: fix [CVE-2026-9265](https://www.cve.org/CVERecord?id=CVE-2026-9265) — heap out-of-bounds read in `print_attribute`
+  UTF8STRING path. Reported and fixed by @timlegge via PR [#59](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/59).
+
+- Fix [#55](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/55): missing length guard in BMPSTRING branch of `print_attribute`.
+
+- Fix [#56](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/56): buffer too small for attribute types with names longer than 4 characters;
+  switched `strncpy` to `memcpy` in the UTF8STRING path.
+
+- Fix potential memory leak on a croak in `print_attribute`.
+
+- Fix broken builds caused by version mismatch in extra `Makefile.PL`.
+
 # 1.95 2026-05-17, security release, update recommended
 
 - Security: fix [CVE-2026-8507](https://www.cve.org/CVERecord?id=CVE-2026-8507) — integer overflow in `print_attribute` leading to
