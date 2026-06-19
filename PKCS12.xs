@@ -762,7 +762,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
                   const char *name, HV * hash)
 {
   X509_ATTRIBUTE *attr;
-  ASN1_TYPE *av;
+  CONST_ASN1_TYPE *av;
   int i, j, attr_nid;
   AV * bags_av = newAV();
   if (!attrlst) {
@@ -789,7 +789,7 @@ int print_attribs(pTHX_ BIO *out, CONST_STACK_OF(X509_ATTRIBUTE) *attrlst,
 
   HV * bag_hv = newHV();
   for (i = 0; i < sk_X509_ATTRIBUTE_num(attrlst); i++) {
-    ASN1_OBJECT *attr_obj;
+    CONST_ASN1_OBJECT *attr_obj;
     attr = sk_X509_ATTRIBUTE_value(attrlst, i);
     attr_obj = X509_ATTRIBUTE_get0_object(attr);
     attr_nid = OBJ_obj2nid(attr_obj);
