@@ -39,6 +39,7 @@ prove -lv t/pkcs12.t
 ```sh
 AUTHOR_TESTING=1 perl Makefile.PL && make
 ```
+Note: on macOS the `darwin` branch of `maint/Makefile_header.PL` never sets `OPTIMIZE`, so `-Wall -Werror` is silently skipped. This only takes effect on Linux CI.
 
 ## Architecture
 
@@ -56,6 +57,7 @@ The distribution uses Dist::Zilla with `MakeMaker::Awesome`. Key points:
 - `Makefile.PL` and `cpanfile` are **generated** by `dzil build` — edit `dist.ini` and `maint/Makefile_header.PL` instead, not `Makefile.PL` directly
 - Version is sourced from `PKCS12.pm` via `[VersionFromMainModule]`
 - `README.md` is auto-generated from the POD in `PKCS12.pm`
+- Develop-only dependencies (e.g. fixture generation scripts) must be declared in `dist.ini` under `[Prereqs / DevelopRequires]` — adding them directly to `cpanfile` is futile, `dzil build` overwrites it
 
 ### Test Certificates (`certs/`)
 
@@ -69,6 +71,24 @@ The codebase maintains compatibility across OpenSSL 1.0, 1.1, and 3.x via:
 - C preprocessor macros aliasing renamed/removed symbols for older versions
 - Runtime version checks using `Crypt::OpenSSL::Guess`'s `openssl_version()` in tests
 - Some features (e.g., `changepass`) are skipped on OpenSSL 3.x due to upstream limitations
+
+## Release
+
+**Build tarball:**
+```sh
+dzil build
+```
+
+**Upload to CPAN** (`dzil release` requires an interactive TTY for `ConfirmRelease`; run it in a real terminal or use the alternative):
+```sh
+dzil release          # interactive terminal only — prompts y/n
+cpan-upload Crypt-OpenSSL-PKCS12-<VERSION>.tar.gz   # non-interactive alternative
+```
+
+**GitHub release** (use `--notes`, not `--body`):
+```sh
+gh release create v<VERSION> --title "..." --notes "..."
+```
 
 ## CI
 
