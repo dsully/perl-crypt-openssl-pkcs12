@@ -77,10 +77,12 @@ C<new_from_file()> to load an existing PKCS12 structure.
 
 =item * legacy_support ( )
 
-Returns true if the installed OpenSSL version supports the legacy provider
-(required for older cipher suites such as RC2). Returns true on OpenSSL 1.x
-(where the legacy provider concept does not apply). On OpenSSL 3.x, returns
-true only when the legacy provider can be loaded at runtime.
+Returns true if the legacy provider has been successfully loaded by a prior
+constructor call (C<new_from_string()> or C<new_from_file()>). Always returns
+true on OpenSSL 1.x (where the legacy provider concept does not apply). On
+OpenSSL 3.x, returns true only if the legacy provider was loaded during the
+most recent constructor call; calling C<legacy_support()> before constructing
+an object may return false even if the provider is loadable.
 
 =item * new_from_string( C<$string> )
 
@@ -96,8 +98,8 @@ C<Encode::encode('octets', $str)> if needed.
 
 Returns the end-entity certificate as a PEM-encoded string (Base64 with
 C<-----BEGIN CERTIFICATE-----> / C<-----END CERTIFICATE-----> headers).
-C<$pass> is required when the PKCS12 file is password-protected. Croaks on
-wrong password or missing certificate.
+C<$pass> is required when the PKCS12 file is password-protected. Returns an
+empty string if the password is wrong or no client certificate is present.
 
 =item * ca_certificate( [C<$pass>] )
 
@@ -108,14 +110,14 @@ required when the PKCS12 file is password-protected.
 =item * private_key( [C<$pass>] )
 
 Returns the private key as a PEM-encoded string. C<$pass> is required when
-the PKCS12 file is password-protected. Croaks if no private key is present
-or if decryption fails.
+the PKCS12 file is password-protected. Returns an empty string if no private
+key is present or if decryption fails (wrong password).
 
-=item * as_string( [C<$pass>] )
+=item * as_string( )
 
 Returns the PKCS12 structure as a raw binary DER string. Useful for writing
 to a file or transmitting over a network without touching the filesystem.
-C<$pass> is required when the structure is password-protected.
+The in-memory structure is serialized as-is; no password is needed or accepted.
 
 =item * mac_ok( [C<$pass>] )
 
@@ -188,7 +190,7 @@ Each bag has a type and the following are available:
                     [0] {
                             bag_attributes   {
                                 friendlyName   "...",
-                                localKeyID     "..." (dualvar: 54)
+                                localKeyID     "54"
                             },
                             key              "...",
                             key_attributes   {
@@ -209,7 +211,7 @@ Each bag has a type and the following are available:
                             bags   [
                                 [0] {
                                         bag_attributes   {
-                                            localKeyID   "01" (dualvar: 1)
+                                            localKeyID   "01"
                                             friendlyName   "",
                                         },
                                         cert             "...".
@@ -226,7 +228,7 @@ Each bag has a type and the following are available:
                 bags   [
                     [0] {
                             bag_attributes   {
-                                localKeyID   "02" (dualvar: 2)
+                                localKeyID   "02"
                             },
                             cert             "...",
                             issuer           "...",
@@ -252,7 +254,7 @@ Each bag has a type and the following are available:
                     [1] {
                             bag_attributes   {
                                 friendlyName   "...",
-                                localKeyID     "..." (dualvar: 54)
+                                localKeyID     "54"
                             },
                             cert             "...",
                             issuer           "...",
@@ -269,10 +271,8 @@ Each bag has a type and the following are available:
     ]
 }
 
-Attributes such as C<localKeyID> are stored as hex strings (e.g. C<"54">).
-The accompanying integer annotation in the structure example above (e.g.
-C<54>) is the decimal interpretation for reference only; in code, treat the
-value as a string.
+Attributes such as C<localKeyID> are stored as plain hex strings (e.g.
+C<"54">, C<"01">). Always treat these values as strings in code.
 
 =back
 
@@ -294,7 +294,8 @@ Flag: suppress output of certificates.
 
 =item * C<INFO>
 
-Flag: print info about the PKCS12 file to C<STDOUT>.
+Flag: enable structural info output (used internally by C<info()> and
+C<info_as_hash()>; output is returned as a string or hash, not printed).
 
 =item * C<CLCERTS>
 
@@ -317,8 +318,8 @@ C<-clcerts>, and C<-cacerts> options of the C<openssl pkcs12> command.
 message is taken from C<ERR_reason_error_string()> and identifies the
 specific failure (e.g. C<"bad decrypt"> for a wrong password).
 
-=item * B<"Error opening ..."> — C<new_from_file()> could not open the
-specified file path.
+=item * B<"Error opening ..."> — C<create()> could not open the specified
+output file path for writing.
 
 =back
 

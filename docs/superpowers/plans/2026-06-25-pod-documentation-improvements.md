@@ -4,13 +4,13 @@
 
 **Goal:** Fix all identified issues in the POD documentation of `PKCS12.pm` and ship them as a pull request.
 
-**Architecture:** All changes are confined to the `__END__` POD section of `PKCS12.pm`. No XS or Perl logic is touched. The branch is `docs/pod-improvements`.
+**Architecture:** Primary changes are confined to the `__END__` POD section of `PKCS12.pm`. No XS or Perl logic is touched. The branch is `docs/pod-improvements`.
 
 **Tech Stack:** Perl POD, `perldoc`, `git`, `gh` CLI.
 
 ## Global Constraints
 
-- Only `PKCS12.pm` is modified (POD section only — nothing above `__END__`)
+- Primary changes are in `PKCS12.pm` (POD section only — nothing above `__END__`); this plan document is also part of the PR
 - `$VERSION` on line 7 must remain `1.97` — do not change it
 - The version string *inside the POD* (currently `1.95`) must be updated to match `1.97`
 - All existing POD headings must be preserved; add content, do not restructure
