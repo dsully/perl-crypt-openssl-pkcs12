@@ -78,9 +78,9 @@ C<new_from_file()> to load an existing PKCS12 structure.
 =item * legacy_support ( )
 
 Returns true if the installed OpenSSL version supports the legacy provider
-(required for older cipher suites such as RC2). Always returns false on
-OpenSSL 1.x, where providers do not exist. On OpenSSL 3.x, returns true
-only when the legacy provider can be loaded at runtime.
+(required for older cipher suites such as RC2). Returns true on OpenSSL 1.x
+(where the legacy provider concept does not apply). On OpenSSL 3.x, returns
+true only when the legacy provider can be loaded at runtime.
 
 =item * new_from_string( C<$string> )
 
@@ -88,20 +88,22 @@ only when the legacy provider can be loaded at runtime.
 
 Create a new Crypt::OpenSSL::PKCS12 instance from a binary PKCS12 string or
 from a file path respectively. Both forms croak on error (invalid format,
-unreadable file, OpenSSL parse failure).
+unreadable file, OpenSSL parse failure). The binary string passed to
+C<new_from_string()> must not carry Perl's UTF-8 flag; use
+C<Encode::encode('octets', $str)> if needed.
 
 =item * certificate( [C<$pass>] )
 
 Returns the end-entity certificate as a PEM-encoded string (Base64 with
-C<-----BEGIN CERTIFICATE----->/ C<-----END CERTIFICATE-----> headers).
+C<-----BEGIN CERTIFICATE-----> / C<-----END CERTIFICATE-----> headers).
 C<$pass> is required when the PKCS12 file is password-protected. Croaks on
 wrong password or missing certificate.
 
 =item * ca_certificate( [C<$pass>] )
 
 Returns any CA certificates in the chain as a concatenated PEM string.
-Returns C<undef> if no CA certificates are present. C<$pass> is required
-when the PKCS12 file is password-protected.
+Returns an empty string if no CA certificates are present. C<$pass> is
+required when the PKCS12 file is password-protected.
 
 =item * private_key( [C<$pass>] )
 
@@ -118,17 +120,17 @@ C<$pass> is required when the structure is password-protected.
 =item * mac_ok( [C<$pass>] )
 
 Verifies the Message Authentication Code (MAC) of the PKCS12 structure using
-C<$pass>. Returns true if the MAC is valid, false otherwise. A failed MAC
-usually indicates a wrong password or a corrupted file.
+C<$pass>. Returns true if the MAC is valid. Croaks on failure (wrong
+password, corrupted file, or OpenSSL error).
 
 =item * changepass( C<$old>, C<$new> )
 
 Re-encrypts the PKCS12 structure with a new password. C<$old> is the current
 password; C<$new> is the replacement. Croaks on failure.
 
-B<Note:> This method is not supported on OpenSSL 3.x and will croak if
-called. Use OpenSSL 1.x or migrate to creating a new PKCS12 structure with
-C<create()>.
+B<Note:> Changing the PKCS12 password is not reliably supported on OpenSSL
+3.x; C<changepass()> may return false or fail silently. Consider
+re-creating the PKCS12 structure with C<create()> instead.
 
 =item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
@@ -267,10 +269,10 @@ Each bag has a type and the following are available:
     ]
 }
 
-Attributes such as C<localKeyID> are returned as B<dualvars>: in string
-context they yield a hex digest (e.g. C<"54">), and in numeric context they
-yield the integer value (e.g. C<54>). Use C<Scalar::Util::dualvar> if you
-need to construct one yourself.
+Attributes such as C<localKeyID> are stored as hex strings (e.g. C<"54">).
+The accompanying integer annotation in the structure example above (e.g.
+C<54>) is the decimal interpretation for reference only; in code, treat the
+value as a string.
 
 =back
 
@@ -317,10 +319,6 @@ specific failure (e.g. C<"bad decrypt"> for a wrong password).
 
 =item * B<"Error opening ..."> — C<new_from_file()> could not open the
 specified file path.
-
-=item * B<"changepass is not supported on OpenSSL 3"> — C<changepass()>
-was called on a system running OpenSSL 3.x. Use OpenSSL 1.x or recreate
-the PKCS12 structure.
 
 =back
 
