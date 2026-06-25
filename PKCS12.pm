@@ -132,17 +132,16 @@ C<create()>.
 
 =item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
-Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
-
-C<$friendly_name> is optional.
+Creates a new PKCS12 file at C<$output_file>. C<$cert> and C<$key> may each be
+either a PEM string (detected by a C<"-----"> prefix) or a filesystem path.
+C<$pass> is used to encrypt the private key. C<$friendly_name> is optional and
+sets the C<friendlyName> bag attribute. Croaks on any OpenSSL error.
 
 =item * create_as_string( C<$cert>, C<$key>, C<$pass>, C<$friendly_name> )
 
-Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
-
-C<$friendly_name> is optional.
-
-Returns a string holding the PKCS12 certicate.
+Same as C<create()> but returns the PKCS12 structure as a raw binary DER string
+instead of writing to a file. C<$cert> and C<$key> may each be a PEM string or
+a filesystem path. C<$friendly_name> is optional. Croaks on any OpenSSL error.
 
 =item * info( C<$pass> )
 
@@ -267,6 +266,11 @@ Each bag has a type and the following are available:
             }
     ]
 }
+
+Attributes such as C<localKeyID> are returned as B<dualvars>: in string
+context they yield a hex digest (e.g. C<"54">), and in numeric context they
+yield the integer value (e.g. C<54>). Use C<Scalar::Util::dualvar> if you
+need to construct one yourself.
 
 =back
 
