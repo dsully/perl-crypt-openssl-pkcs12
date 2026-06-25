@@ -92,27 +92,43 @@ unreadable file, OpenSSL parse failure).
 
 =item * certificate( [C<$pass>] )
 
-Get the Base64 representation of the certificate.
+Returns the end-entity certificate as a PEM-encoded string (Base64 with
+C<-----BEGIN CERTIFICATE----->/ C<-----END CERTIFICATE-----> headers).
+C<$pass> is required when the PKCS12 file is password-protected. Croaks on
+wrong password or missing certificate.
 
 =item * ca_certificate( [C<$pass>] )
 
-Get the Base64 representation of the CA certificate chain.
+Returns any CA certificates in the chain as a concatenated PEM string.
+Returns C<undef> if no CA certificates are present. C<$pass> is required
+when the PKCS12 file is password-protected.
 
 =item * private_key( [C<$pass>] )
 
-Get the Base64 representation of the private key.
+Returns the private key as a PEM-encoded string. C<$pass> is required when
+the PKCS12 file is password-protected. Croaks if no private key is present
+or if decryption fails.
 
 =item * as_string( [C<$pass>] )
 
-Get the binary representation as a string.
+Returns the PKCS12 structure as a raw binary DER string. Useful for writing
+to a file or transmitting over a network without touching the filesystem.
+C<$pass> is required when the structure is password-protected.
 
 =item * mac_ok( [C<$pass>] )
 
-Verify the certificates Message Authentication Code
+Verifies the Message Authentication Code (MAC) of the PKCS12 structure using
+C<$pass>. Returns true if the MAC is valid, false otherwise. A failed MAC
+usually indicates a wrong password or a corrupted file.
 
 =item * changepass( C<$old>, C<$new> )
 
-Change a certificate's password.
+Re-encrypts the PKCS12 structure with a new password. C<$old> is the current
+password; C<$new> is the replacement. Croaks on failure.
+
+B<Note:> This method is not supported on OpenSSL 3.x and will croak if
+called. Use OpenSSL 1.x or migrate to creating a new PKCS12 structure with
+C<create()>.
 
 =item * create( C<$cert>, C<$key>, C<$pass>, C<$output_file>, C<$friendly_name> )
 
