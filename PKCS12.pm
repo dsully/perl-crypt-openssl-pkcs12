@@ -40,14 +40,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
   print $pkcs12->private_key($pass);
 
   if ($pkcs12->mac_ok($pass)) {
-  ...
+    # MAC verification passed
+  }
 
   # Creating a file
   $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', 'friendly name');
 
 
   # Creating a string
-  my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
+  my $pkcs12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
   # Reproducing OpenSSL's info
   my $info = $pkcs12->info($pass);
@@ -57,7 +58,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 =head1 VERSION
 
-This documentation describes version 1.95 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.97 of Crypt::OpenSSL::PKCS12
 
 =head1 DESCRIPTION
 
@@ -95,11 +96,11 @@ Get the Base64 representation of the private key.
 
 =item * as_string( [C<$pass>] )
 
-Get the binary represenation as a string.
+Get the binary representation as a string.
 
 =item * mac_ok( [C<$pass>] )
 
-Verifiy the certificates Message Authentication Code
+Verify the certificates Message Authentication Code
 
 =item * changepass( C<$old>, C<$new> )
 
