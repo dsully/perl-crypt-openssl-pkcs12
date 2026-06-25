@@ -50,6 +50,9 @@ The XS file does all the heavy lifting:
 - OpenSSL 3.x requires loading providers (`legacy` and `deflt` globals); this is handled via `#if OPENSSL_VERSION_NUMBER >= 0x30000000L`
 - `_load_pkey()` and `_load_cert_chain()` accept either a PEM string (detected by `"----"` prefix) or a file path — this dual-input pattern is used by `create()` and `create_as_string()`
 - `CHECK_OPEN_SSL(p_result)` macro wraps OpenSSL calls and croaks with an error message from `ERR_reason_error_string()` on failure
+- `certificate()`, `private_key()`, `ca_certificate()` silently return an empty string on wrong password or missing content — the return value of `dump_certs_keys_p12()` is ignored, so these never croak on decryption failure
+- `legacy_support()` checks the global `legacy` pointer (set only by constructors); may return false before any object is constructed even if the provider is loadable
+- `as_string()` takes no arguments — it serializes the in-memory PKCS12 object directly with no password
 
 ### Distribution Management (`dist.ini`)
 
@@ -58,6 +61,7 @@ The distribution uses Dist::Zilla with `MakeMaker::Awesome`. Key points:
 - Version is sourced from `PKCS12.pm` via `[VersionFromMainModule]`
 - `README.md` is auto-generated from the POD in `PKCS12.pm`
 - Develop-only dependencies (e.g. fixture generation scripts) must be declared in `dist.ini` under `[Prereqs / DevelopRequires]` — adding them directly to `cpanfile` is futile, `dzil build` overwrites it
+- Runtime prereqs (including minimum Perl) go in `[Prereqs / RuntimeRequires]`; minimum Perl syntax: `perl = 5.014000`
 
 ### Test Certificates (`certs/`)
 
@@ -93,3 +97,11 @@ gh release create v<VERSION> --title "..." --notes "..."
 ## CI
 
 GitHub Actions workflows in `.github/workflows/` test against Linux (Perl 5.14–5.36), macOS, Windows (Strawberry Perl), Cygwin, and MSYS2/MinGW. The Linux workflow is the canonical reference for the build/test steps.
+
+## GitHub CLI Tips
+
+**Fetching inline PR review comments** (per-line, not top-level review summaries):
+```sh
+gh api repos/dsully/perl-crypt-openssl-pkcs12/pulls/{pr}/comments   # inline comments
+gh pr view {pr} --json reviews                                        # top-level summaries only
+```
