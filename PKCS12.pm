@@ -284,19 +284,45 @@ On request:
 
 =item * C<NOKEYS>
 
+Flag: suppress output of private keys.
+
 =item * C<NOCERTS>
+
+Flag: suppress output of certificates.
 
 =item * C<INFO>
 
+Flag: print info about the PKCS12 file to C<STDOUT>.
+
 =item * C<CLCERTS>
+
+Flag: output only client (end-entity) certificates.
 
 =item * C<CACERTS>
 
+Flag: output only CA certificates.
+
 =back
+
+These flags mirror the corresponding C<-nokeys>, C<-nocerts>, C<-info>,
+C<-clcerts>, and C<-cacerts> options of the C<openssl pkcs12> command.
 
 =head1 DIAGNOSTICS
 
-No diagnostics are documented at this time
+=over 4
+
+=item * B<"OpenSSL error: ..."> — an OpenSSL call failed. The trailing
+message is taken from C<ERR_reason_error_string()> and identifies the
+specific failure (e.g. C<"bad decrypt"> for a wrong password).
+
+=item * B<"Error opening ..."> — C<new_from_file()> could not open the
+specified file path.
+
+=item * B<"changepass is not supported on OpenSSL 3"> — C<changepass()>
+was called on a system running OpenSSL 3.x. Use OpenSSL 1.x or recreate
+the PKCS12 structure.
+
+=back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -310,7 +336,7 @@ This distribution has the following dependencies
 
 =item * An installation of OpenSSL, either version 1.X.X or version 3.X.X
 
-=item * Perl 5.8
+=item * Perl 5.14
 
 =back
 
@@ -318,7 +344,7 @@ This distribution has the following dependencies
 
 =over
 
-=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/man1.1.1/man1/openssl.html>)
+=item * OpenSSL(1) (L<HTTP version with OpenSSL.org|https://www.openssl.org/docs/manmaster/man1/openssl.html>)
 
 =item * L<Crypt::OpenSSL::X509|https://metacpan.org/pod/Crypt::OpenSSL::X509>
 
