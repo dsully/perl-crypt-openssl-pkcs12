@@ -126,7 +126,7 @@ password, corrupted file, or OpenSSL error).
 =item * changepass( C<$old>, C<$new> )
 
 Re-encrypts the PKCS12 structure with a new password. C<$old> is the current
-password; C<$new> is the replacement. Croaks on failure.
+password; C<$new> is the replacement. Returns false on failure.
 
 B<Note:> Changing the PKCS12 password is not reliably supported on OpenSSL
 3.x; C<changepass()> may return false or fail silently. Consider
