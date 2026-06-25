@@ -72,15 +72,23 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 
 =item * new( )
 
+Create an empty Crypt::OpenSSL::PKCS12 object. Use C<new_from_string()> or
+C<new_from_file()> to load an existing PKCS12 structure.
+
 =item * legacy_support ( )
 
-Check whether the openssl version installed supports the legacy provider.
+Returns true if the installed OpenSSL version supports the legacy provider
+(required for older cipher suites such as RC2). Always returns false on
+OpenSSL 1.x, where providers do not exist. On OpenSSL 3.x, returns true
+only when the legacy provider can be loaded at runtime.
 
 =item * new_from_string( C<$string> )
 
 =item * new_from_file( C<$filename> )
 
-Create a new Crypt::OpenSSL::PKCS12 instance.
+Create a new Crypt::OpenSSL::PKCS12 instance from a binary PKCS12 string or
+from a file path respectively. Both forms croak on error (invalid format,
+unreadable file, OpenSSL parse failure).
 
 =item * certificate( [C<$pass>] )
 
