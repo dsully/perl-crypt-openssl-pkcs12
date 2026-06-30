@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.014000;
 use ExtUtils::MakeMaker;
 
 use Config;
@@ -71,6 +72,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Crypt-OpenSSL-PKCS12",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Crypt::OpenSSL::PKCS12",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {

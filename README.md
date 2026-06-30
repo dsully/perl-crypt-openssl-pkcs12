@@ -13,14 +13,15 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
     print $pkcs12->private_key($pass);
 
     if ($pkcs12->mac_ok($pass)) {
-    ...
+      # MAC verification passed
+    }
 
     # Creating a file
     $pkcs12->create('test-cert.pem', 'test-key.pem', $pass, 'out.p12', 'friendly name');
 
 
     # Creating a string
-    my $pksc12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
+    my $pkcs12_data = $pkcs12->create_as_string('test-cert.pem', 'test-key.pem', $pass, 'friendly name');
 
     # Reproducing OpenSSL's info
     my $info = $pkcs12->info($pass);
@@ -30,7 +31,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 # VERSION
 
-This documentation describes version 1.95 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.97 of Crypt::OpenSSL::PKCS12
 
 # DESCRIPTION
 
@@ -41,52 +42,80 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
 # SUBROUTINES/METHODS
 
 - new( )
+
+    Create an empty Crypt::OpenSSL::PKCS12 object. Use `new_from_string()` or
+    `new_from_file()` to load an existing PKCS12 structure.
+
 - legacy\_support ( )
 
-    Check whether the openssl version installed supports the legacy provider.
+    Returns true if the legacy provider has been successfully loaded by a prior
+    constructor call (`new_from_string()` or `new_from_file()`). Always returns
+    true on OpenSSL 1.x (where the legacy provider concept does not apply). On
+    OpenSSL 3.x, returns true only if the legacy provider was loaded during the
+    most recent constructor call; calling `legacy_support()` before constructing
+    an object may return false even if the provider is loadable.
 
 - new\_from\_string( `$string` )
 - new\_from\_file( `$filename` )
 
-    Create a new Crypt::OpenSSL::PKCS12 instance.
+    Create a new Crypt::OpenSSL::PKCS12 instance from a binary PKCS12 string or
+    from a file path respectively. Both forms croak on error (invalid format,
+    unreadable file, OpenSSL parse failure). The binary string passed to
+    `new_from_string()` must not carry Perl's UTF-8 flag; use
+    `Encode::encode('octets', $str)` if needed.
 
 - certificate( \[`$pass`\] )
 
-    Get the Base64 representation of the certificate.
+    Returns the end-entity certificate as a PEM-encoded string (Base64 with
+    `-----BEGIN CERTIFICATE-----` / `-----END CERTIFICATE-----` headers).
+    `$pass` is required when the PKCS12 file is password-protected. Returns an
+    empty string if the password is wrong or no client certificate is present.
 
 - ca\_certificate( \[`$pass`\] )
 
-    Get the Base64 representation of the CA certificate chain.
+    Returns any CA certificates in the chain as a concatenated PEM string.
+    Returns an empty string if no CA certificates are present. `$pass` is
+    required when the PKCS12 file is password-protected.
 
 - private\_key( \[`$pass`\] )
 
-    Get the Base64 representation of the private key.
+    Returns the private key as a PEM-encoded string. `$pass` is required when
+    the PKCS12 file is password-protected. Returns an empty string if no private
+    key is present or if decryption fails (wrong password).
 
-- as\_string( \[`$pass`\] )
+- as\_string( )
 
-    Get the binary represenation as a string.
+    Returns the PKCS12 structure as a raw binary DER string. Useful for writing
+    to a file or transmitting over a network without touching the filesystem.
+    The in-memory structure is serialized as-is; no password is needed or accepted.
 
 - mac\_ok( \[`$pass`\] )
 
-    Verifiy the certificates Message Authentication Code
+    Verifies the Message Authentication Code (MAC) of the PKCS12 structure using
+    `$pass`. Returns true if the MAC is valid. Croaks on failure (wrong
+    password, corrupted file, or OpenSSL error).
 
 - changepass( `$old`, `$new` )
 
-    Change a certificate's password.
+    Re-encrypts the PKCS12 structure with a new password. `$old` is the current
+    password; `$new` is the replacement. Returns false on failure.
+
+    **Note:** Changing the PKCS12 password is not reliably supported on OpenSSL
+    3.x; `changepass()` may return false or fail silently. Consider
+    re-creating the PKCS12 structure with `create()` instead.
 
 - create( `$cert`, `$key`, `$pass`, `$output_file`, `$friendly_name` )
 
-    Create a new PKCS12 certificate. $cert & $key may either be strings or filenames.
-
-    `$friendly_name` is optional.
+    Creates a new PKCS12 file at `$output_file`. `$cert` and `$key` may each be
+    either a PEM string (detected by a `"-----"` prefix) or a filesystem path.
+    `$pass` is used to encrypt the private key. `$friendly_name` is optional and
+    sets the `friendlyName` bag attribute. Croaks on any OpenSSL error.
 
 - create\_as\_string( `$cert`, `$key`, `$pass`, `$friendly_name` )
 
-    Create a new PKCS12 certificate string. $cert & $key may either be strings or filenames.
-
-    `$friendly_name` is optional.
-
-    Returns a string holding the PKCS12 certicate.
+    Same as `create()` but returns the PKCS12 structure as a raw binary DER string
+    instead of writing to a file. `$cert` and `$key` may each be a PEM string or
+    a filesystem path. `$friendly_name` is optional. Croaks on any OpenSSL error.
 
 - info( `$pass` )
 
@@ -131,7 +160,7 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
                         \[0\] {
                                 bag\_attributes   {
                                     friendlyName   "...",
-                                    localKeyID     "..." (dualvar: 54)
+                                    localKeyID     "54"
                                 },
                                 key              "...",
                                 key\_attributes   {
@@ -152,7 +181,7 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
                                 bags   \[
                                     \[0\] {
                                             bag\_attributes   {
-                                                localKeyID   "01" (dualvar: 1)
+                                                localKeyID   "01"
                                                 friendlyName   "",
                                             },
                                             cert             "...".
@@ -169,7 +198,7 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
                     bags   \[
                         \[0\] {
                                 bag\_attributes   {
-                                    localKeyID   "02" (dualvar: 2)
+                                    localKeyID   "02"
                                 },
                                 cert             "...",
                                 issuer           "...",
@@ -195,7 +224,7 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
                         \[1\] {
                                 bag\_attributes   {
                                     friendlyName   "...",
-                                    localKeyID     "..." (dualvar: 54)
+                                    localKeyID     "54"
                                 },
                                 cert             "...",
                                 issuer           "...",
@@ -212,6 +241,9 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
         \]
     }
 
+    Attributes such as `localKeyID` are stored as plain hex strings (e.g.
+    `"54"`, `"01"`). Always treat these values as strings in code.
+
 # EXPORTS
 
 None by default.
@@ -219,14 +251,36 @@ None by default.
 On request:
 
 - `NOKEYS`
+
+    Flag: suppress output of private keys.
+
 - `NOCERTS`
+
+    Flag: suppress output of certificates.
+
 - `INFO`
+
+    Flag: enable structural info output (used internally by `info()` and
+    `info_as_hash()`; output is returned as a string or hash, not printed).
+
 - `CLCERTS`
+
+    Flag: output only client (end-entity) certificates.
+
 - `CACERTS`
+
+    Flag: output only CA certificates.
+
+These flags mirror the corresponding `-nokeys`, `-nocerts`, `-info`,
+`-clcerts`, and `-cacerts` options of the `openssl pkcs12` command.
 
 # DIAGNOSTICS
 
-No diagnostics are documented at this time
+- **"OpenSSL error: ..."** — an OpenSSL call failed. The trailing
+message is taken from `ERR_reason_error_string()` and identifies the
+specific failure (e.g. `"bad decrypt"` for a wrong password).
+- **"Error opening ..."** — `create()` could not open the specified
+output file path for writing.
 
 # CONFIGURATION AND ENVIRONMENT
 
@@ -237,11 +291,11 @@ No special environment or configuration is required.
 This distribution has the following dependencies
 
 - An installation of OpenSSL, either version 1.X.X or version 3.X.X
-- Perl 5.8
+- Perl 5.14
 
 # SEE ALSO
 
-- OpenSSL(1) ([HTTP version with OpenSSL.org](https://www.openssl.org/docs/man1.1.1/man1/openssl.html))
+- OpenSSL(1) ([HTTP version with OpenSSL.org](https://www.openssl.org/docs/manmaster/man1/openssl.html))
 - [Crypt::OpenSSL::X509](https://metacpan.org/pod/Crypt::OpenSSL::X509)
 - [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt::OpenSSL::RSA)
 - [Crypt::OpenSSL::Bignum](https://metacpan.org/pod/Crypt::OpenSSL::Bignum)
