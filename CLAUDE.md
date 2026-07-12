@@ -98,6 +98,10 @@ gh release create v<VERSION> --title "..." --notes "..."
 
 GitHub Actions workflows in `.github/workflows/` test against Linux (Perl 5.14–5.36), macOS, Windows (Strawberry Perl), Cygwin, and MSYS2/MinGW. The Linux workflow is the canonical reference for the build/test steps.
 
+**Workflow security (zizmor):** `zizmor .github/workflows/` audits Actions workflows locally and should report 0 findings under the default persona (`--pedantic` surfaces extra style findings; `--fix=safe` / `--fix=all` applies automated fixes). `.github/workflows/zizmor.yml` runs it in CI and uploads results to the Security tab as SARIF — it does not fail the build on findings. Pin third-party actions to a commit SHA via `git ls-remote https://github.com/<owner>/<repo> refs/tags/<tag>` (peel annotated tags with `refs/tags/<tag>^{}` to get the commit, not the tag object) — comment with the specific immutable tag (e.g. `v2.32.0`), never a moving major alias (`v2`), since majors get repointed as new releases ship.
+
+**Dependabot:** `.github/dependabot.yml` tracks only the `github-actions` ecosystem.
+
 ## GitHub CLI Tips
 
 **Fetching inline PR review comments** (per-line, not top-level review summaries):
@@ -105,3 +109,5 @@ GitHub Actions workflows in `.github/workflows/` test against Linux (Perl 5.14�
 gh api repos/dsully/perl-crypt-openssl-pkcs12/pulls/{pr}/comments   # inline comments
 gh pr view {pr} --json reviews                                        # top-level summaries only
 ```
+
+**Remotes:** `origin` is the canonical repo (dsully/perl-crypt-openssl-pkcs12) — push branches and open PRs against it. `timlegge` is an unrelated personal fork remote also configured on this checkout.
