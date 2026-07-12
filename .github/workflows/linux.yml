@@ -56,4 +56,4 @@ jobs:
           perl Makefile.PL;
           make
       - name: Run Tests
-        run: prove -lr -l -b -I inc t
+        run: prove -lr -l -b t

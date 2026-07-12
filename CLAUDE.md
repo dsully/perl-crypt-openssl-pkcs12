@@ -27,7 +27,7 @@ make
 
 **Run all tests:**
 ```sh
-prove -lr -l -b -I inc t
+prove -lr -l -b t
 ```
 
 **Run a single test:**

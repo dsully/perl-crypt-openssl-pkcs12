@@ -11,7 +11,7 @@ Run through the release checklist for this distribution. Check each step and rep
 
 3. **Tests pass** — run the full test suite and confirm all pass:
    ```
-   perl Makefile.PL && make && prove -lr -l -b -I inc t
+   perl Makefile.PL && make && prove -lr -l -b t
    ```
 
 4. **Author tests** — run with strict compiler warnings enabled:

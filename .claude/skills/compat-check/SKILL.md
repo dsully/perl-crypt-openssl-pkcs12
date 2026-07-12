@@ -12,7 +12,7 @@ Before editing PKCS12.xs, review these compatibility constraints:
 - The version boundary `0x10100000L` separates the pre-1.1 compat block from the 1.1+ definitions — new macros go in both branches.
 
 **Perl version targets**
-- The distribution targets Perl 5.8+. Avoid XS APIs introduced after 5.8 unless guarded by `#if PERL_VERSION >= X`.
+- The distribution targets Perl 5.14+ (`dist.ini`'s `RuntimeRequires`). Avoid XS APIs introduced after 5.14 unless guarded by `#if PERL_VERSION >= X`.
 - `ppport.h` (from Devel::PPPort) backfills many newer XS macros — check it covers any new macro before adding a manual compat guard.
 
 **Platform differences**
