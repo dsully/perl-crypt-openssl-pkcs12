@@ -44,7 +44,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Cygwin
-        uses: egor-tensin/setup-cygwin@0c5b8b7b0f35a493f5b8c2687c5fd204c2628538 # v3
+        uses: egor-tensin/setup-cygwin@0c5b8b7b0f35a493f5b8c2687c5fd204c2628538 # v3.0.1
         with:
           platform: x64
           packages: make perl gcc-core gcc-g++ pkg-config libcrypt-devel libssl-devel libnsl-devel git curl

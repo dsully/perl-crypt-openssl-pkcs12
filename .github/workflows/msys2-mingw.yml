@@ -42,7 +42,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up msys2
-        uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2
+        uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
         with:
           update: true
           install: >-
