@@ -39,10 +39,11 @@ jobs:
     container:
       image: perl:${{ matrix.perl-version }}
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Checkout repository
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
         with:
           persist-credentials: false
-      - name: uses install-with-cpanm
+      - name: Install dependencies with cpanm
         uses: perl-actions/install-with-cpanm@10d60f00b4073f484fc29d45bfbe2f776397ab3d # v1.7
         with:
           cpanfile: "cpanfile"
