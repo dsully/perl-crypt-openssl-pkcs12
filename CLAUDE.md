@@ -32,7 +32,7 @@ prove -lr -l -b -I inc t
 
 **Run a single test:**
 ```sh
-prove -lv t/pkcs12.t
+prove -lvb t/pkcs12.t
 ```
 
 **Author testing** (enables `-Wall -Werror` for gcc):
