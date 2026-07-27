@@ -176,6 +176,10 @@ static const char *ssl_error(pTHX) {
   ERR_print_errors(bio);
   sv = extractBioString(aTHX_ bio);
   ERR_clear_error();
+
+  if (!sv || !SvOK(sv)) {
+    return ""; // Return an empty C string if no actual error messages were found
+  }
   return SvPV(sv, l);
 }
 
