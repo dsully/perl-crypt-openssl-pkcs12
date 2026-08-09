@@ -1,5 +1,29 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+# 1.99-TRIAL 2026-08-09, trial release, OpenSSL 4.0 compatibility, testing wanted
+
+- Fix [#57](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/57) and
+  [#60](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/60): OpenSSL 4.0 made `ASN1_STRING` (the type backing
+  `ASN1_BMPSTRING`, `ASN1_UTF8STRING`, `ASN1_OCTET_STRING`, and `ASN1_BIT_STRING`) opaque, breaking direct `->data`/`->length`
+  struct access throughout `print_attribute()`. Replaced with the `ASN1_STRING_get0_data()`/`ASN1_STRING_length()` accessor API,
+  which also works unchanged on OpenSSL 1.x/3.x. Verified against a real OpenSSL 4.0.1 build: compiles, links, and passes the
+  full test suite, where the previous code failed to compile with "incomplete definition of type" errors. Merged via PR
+  [#61](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/61).
+
+- Fix [#62](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62) (partial): `changepass()`'s underlying
+  `PKCS12_newpass()` is fundamentally broken upstream for PBES2-encrypted PKCS12 files, the default on OpenSSL 3.x/4.x,
+  confirmed via [openssl/openssl#19092](https://github.com/openssl/openssl/issues/19092) and not fixable from this
+  module without a much larger reimplementation. `changepass()` no longer crashes the whole process on OpenSSL 3.x/4.x (a
+  follow-on `mac_ok()` croak was previously left unguarded after a failed `changepass()`), and the test suite's skip guard now
+  correctly covers every OpenSSL major except the confirmed-working 1.x, instead of only 3.x. Documented the limitation in POD
+  and `CLAUDE.md`. Merged via PR [#76](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/76) and
+  [#77](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/77).
+
+- This is a trial release: no CI job here can build against OpenSSL 4.0 yet (too new for current CI base images), so this
+  exists to get real-world CPAN Testers coverage on OpenSSL 4.0 environments before a stable release. Please report any build
+  or test failures against OpenSSL 4.0 on
+  [#62](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62) or a new issue.
+
 # 1.98 2026-08-08, security release, update recommended
 
 - Security: fix NULL pointer dereference in `print_attribute()`'s `V_ASN1_BMPSTRING` branch. An empty (zero-length) BMPSTRING bag

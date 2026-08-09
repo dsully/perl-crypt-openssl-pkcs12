@@ -31,7 +31,7 @@ Crypt::OpenSSL::PKCS12 - Perl extension to OpenSSL's PKCS12 API.
 
 # VERSION
 
-This documentation describes version 1.97 of Crypt::OpenSSL::PKCS12
+This documentation describes version 1.99 of Crypt::OpenSSL::PKCS12
 
 # DESCRIPTION
 
@@ -100,9 +100,15 @@ This distribution implements a subset of OpenSSL's PKCS12 API.
     Re-encrypts the PKCS12 structure with a new password. `$old` is the current
     password; `$new` is the replacement. Returns false on failure.
 
-    **Note:** Changing the PKCS12 password is not reliably supported on OpenSSL
-    3.x; `changepass()` may return false or fail silently. Consider
-    re-creating the PKCS12 structure with `create()` instead.
+    **Note:** Changing the PKCS12 password is not supported on OpenSSL 3.x or
+    4.x for PBES2-encrypted files (the default OpenSSL uses for newly created
+    PKCS12 files) — `changepass()` will return false. This is a known
+    upstream OpenSSL limitation
+    ([openssl/openssl#19092](https://github.com/openssl/openssl/issues/19092)),
+    not specific to this module; only OpenSSL 1.x is confirmed to work. See
+    [https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62) for
+    details. Consider re-creating the PKCS12 structure with `create()`
+    instead.
 
 - create( `$cert`, `$key`, `$pass`, `$output_file`, `$friendly_name` )
 
