@@ -42,3 +42,4 @@ Crypt-OpenSSL-PKCS12-*.*/
 804cf94a94dd9091525be7b36b57ef4006c5b282.patch
 PKCS12.c
 .claude/settings.local.json
+.env
