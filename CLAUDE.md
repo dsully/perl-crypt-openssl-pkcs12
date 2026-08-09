@@ -71,10 +71,15 @@ Tests use pre-generated `.p12` files in `certs/`. Different cert files are used 
 
 ### OpenSSL Version Compatibility
 
-The codebase maintains compatibility across OpenSSL 1.0, 1.1, and 3.x via:
+The codebase maintains compatibility across OpenSSL 1.0, 1.1, 3.x, and 4.x via:
 - C preprocessor macros aliasing renamed/removed symbols for older versions
 - Runtime version checks using `Crypt::OpenSSL::Guess`'s `openssl_version()` in tests
-- Some features (e.g., `changepass`) are skipped on OpenSSL 3.x due to upstream limitations
+- `changepass` (`PKCS12_newpass()`) is a known-broken upstream API for PBES2-encrypted
+  PKCS12 files (the default on OpenSSL 3.x/4.x) — see
+  [openssl/openssl#19092](https://github.com/openssl/openssl/issues/19092) and
+  [#62](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62). Only OpenSSL 1.x
+  is confirmed working; the test suite skips it everywhere else (`t/pkcs12.t`,
+  `t/pkcs12-string.t`, `t/pkcs12-from-scratch.t`)
 
 ## Release
 
