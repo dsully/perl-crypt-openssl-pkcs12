@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-`Crypt::OpenSSL::PKCS12` is a Perl XS extension wrapping OpenSSL's PKCS12 API. It supports both OpenSSL 1.x and 3.x and is managed via [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla).
+`Crypt::OpenSSL::PKCS12` is a Perl XS extension wrapping OpenSSL's PKCS12 API. It supports OpenSSL 1.x, 3.x, and 4.x and is managed via [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla).
 
 The core implementation is split between:
 - `PKCS12.xs` — XS/C code that interfaces directly with OpenSSL's libssl/libcrypto
@@ -41,6 +41,14 @@ AUTHOR_TESTING=1 perl Makefile.PL && make
 ```
 Note: on macOS the `darwin` branch of `maint/Makefile_header.PL` never sets `OPTIMIZE`, so `-Wall -Werror` is silently skipped. This only takes effect on Linux CI.
 
+**Testing against a specific OpenSSL version locally** (macOS/Homebrew): install e.g. `openssl@1.1`, `openssl@3.0`, `openssl@3.5`, `openssl@4` via `brew install`, then point the build at one — `Crypt::OpenSSL::Guess` reads `OPENSSL_PREFIX` directly:
+```sh
+export OPENSSL_PREFIX=/opt/homebrew/opt/openssl@4
+export DYLD_LIBRARY_PATH="$OPENSSL_PREFIX/lib"
+perl Makefile.PL && make && prove -lr -l -b t
+```
+No CI job here builds against OpenSSL 4.0 yet (too new for CI base images) — this is the only way to verify a 4.0-specific fix actually works rather than just compiles in review.
+
 ## Architecture
 
 ### XS Layer (`PKCS12.xs`)
@@ -58,6 +66,7 @@ The XS file does all the heavy lifting:
 
 The distribution uses Dist::Zilla with `MakeMaker::Awesome`. Key points:
 - `Makefile.PL` and `cpanfile` are **generated** by `dzil build` — edit `dist.ini` and `maint/Makefile_header.PL` instead, not `Makefile.PL` directly
+- Bumping `$VERSION` in `PKCS12.pm` alone is not enough — `Makefile.PL` hardcodes the version from the last `dzil build`/`dzil test`. A stale one causes `object version X does not match bootstrap parameter Y` at runtime; always `dzil build` after a version bump (also regenerates `README.md`). It may also incidentally rewrite `LICENSE`'s GPL boilerplate if the local `Software::License` version differs from whatever last generated it — unrelated noise, safe to revert.
 - Version is sourced from `PKCS12.pm` via `[VersionFromMainModule]`
 - `README.md` is auto-generated from the POD in `PKCS12.pm`
 - Develop-only dependencies (e.g. fixture generation scripts) must be declared in `dist.ini` under `[Prereqs / DevelopRequires]` — adding them directly to `cpanfile` is futile, `dzil build` overwrites it
@@ -93,6 +102,8 @@ dzil build
 dzil release          # interactive terminal only — prompts y/n
 cpan-upload Crypt-OpenSSL-PKCS12-<VERSION>.tar.gz   # non-interactive alternative
 ```
+
+**Trial release** (e.g. to solicit CPAN Testers coverage before committing to stable): `dzil release --trial` uploads as `Crypt-OpenSSL-PKCS12-<VERSION>-TRIAL.tar.gz` — PAUSE indexes it as non-default without needing an underscore in `$VERSION`. Tag normally (`v<VERSION>`, no `-TRIAL` suffix) so the same commit can later be promoted to a real release with no changes.
 
 **GitHub release** (use `--notes`, not `--body`):
 ```sh
