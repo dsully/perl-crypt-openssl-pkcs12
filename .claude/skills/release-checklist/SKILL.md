@@ -14,6 +14,8 @@ Run through the release checklist for this distribution. Check each step and rep
    perl Makefile.PL && make && prove -lr -l -b t
    ```
 
+   **OpenSSL 4.0 caveat**: no CI job or the usual local dev environment builds against real OpenSSL 4.0 (it's too new for the CI base images). `changepass` is known-broken there — `PKCS12_newpass()` fails with `unknown pbe algorithm ... hmacWithSHA256` (tracked in #62) — and the test suite's skip guard only recognizes `3.x`, so on 4.0 it fails loudly (aborting the rest of that test file) instead of skipping gracefully. If you build locally against OpenSSL 4.0 (e.g. via `scripts/test.sh` or `OPENSSL_PREFIX=/opt/homebrew/opt/openssl@4`) and see `t/pkcs12.t`, `t/pkcs12-string.t`, or `t/pkcs12-from-scratch.t` fail on "Changing password" with a "Bad plan" TAP error, that's this known, already-tracked gap — not a new regression to chase before release.
+
 4. **Author and Release tests** — run with strict compiler warnings enabled:
    ```
    AUTHOR_TESTING=1 RELEASE_TESTING=1 carton exec -- dzil test
