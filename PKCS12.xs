@@ -1210,7 +1210,7 @@ changepass(pkcs12, oldpwd = &PL_sv_undef, newpwd = &PL_sv_undef)
          "Note: PKCS12_newpass() cannot change the password on PBES2-encrypted "
          "PKCS12 files, which OpenSSL 3.x/4.x use by default for newly created "
          "files. This is a known upstream OpenSSL limitation, not specific to "
-         "this module: https://github.com/openssl/openssl/issues/19092", ssl_error(aTHX));
+         "this module: https://github.com/openssl/openssl/issues/19092\n", ssl_error(aTHX));
     RETVAL = &PL_sv_no;
   } else {
     RETVAL = &PL_sv_yes;

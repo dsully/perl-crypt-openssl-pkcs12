@@ -53,16 +53,20 @@ SKIP: {
         skip("changepass unsupported on OpenSSL $major (see #62)", 3);
     } else {
         # try changing the password
+        local $@;
         my $changed = eval { $pkcs12->changepass($pass, 'foo') };
         ok($changed, 'Changing password') or diag($@ || 'changepass returned false');
 
         SKIP: {
             skip('changepass failed, skipping dependent checks', 2) unless $changed;
 
+            local $@;
             my $verified = eval { $pkcs12->mac_ok('foo') };
             ok($verified, 'Reasserting mac') or diag($@ || 'mac_ok returned false');
 
-            ok($pkcs12->changepass('foo', $pass), 'Changing password again');
+            local $@;
+            my $changed_again = eval { $pkcs12->changepass('foo', $pass) };
+            ok($changed_again, 'Changing password again') or diag($@ || 'changepass returned false');
         }
     }
 }
