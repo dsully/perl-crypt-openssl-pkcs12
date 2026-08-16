@@ -1,6 +1,10 @@
 # Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
-# 1.99-TRIAL 2026-08-09, trial release, OpenSSL 4.0 compatibility, testing wanted
+# 1.99 2026-08-16, OpenSSL 4.0 compatibility, update recommended
+
+- Promoted from the 1.99-TRIAL release of 2026-08-09 with no code changes. CPAN Testers coverage came back clean, including
+  real OpenSSL 4.0 builds; the only failure observed was on OpenBSD with Perl 5.45.2, a platform/Perl combination this
+  distribution does not target (minimum supported Perl is 5.14, per `RuntimeRequires` in `dist.ini`).
 
 - Fix [#57](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/57) and
   [#60](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/60): OpenSSL 4.0 made `ASN1_STRING` (the type backing
@@ -18,11 +22,6 @@
   correctly covers every OpenSSL major except the confirmed-working 1.x, instead of only 3.x. Documented the limitation in POD
   and `CLAUDE.md`. Merged via PR [#76](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/76) and
   [#77](https://github.com/dsully/perl-crypt-openssl-pkcs12/pull/77).
-
-- This is a trial release: no CI job here can build against OpenSSL 4.0 yet (too new for current CI base images), so this
-  exists to get real-world CPAN Testers coverage on OpenSSL 4.0 environments before a stable release. Please report any build
-  or test failures against OpenSSL 4.0 on
-  [#62](https://github.com/dsully/perl-crypt-openssl-pkcs12/issues/62) or a new issue.
 
 # 1.98 2026-08-08, security release, update recommended
 
