@@ -92,6 +92,12 @@ The codebase maintains compatibility across OpenSSL 1.0, 1.1, 3.x, and 4.x via:
 
 ## Release
 
+**Full author+release tests** (strict compiler warnings plus kwalitee/meta-json checks; run before building):
+```sh
+AUTHOR_TESTING=1 RELEASE_TESTING=1 carton exec -- dzil test
+```
+This also regenerates `Makefile.PL`, `LICENSE`, `cpanfile` in the repo root via `CopyFilesFromBuild` — `git diff LICENSE` afterward and revert if it's just the `Software::License` boilerplate churn described above; keep it if `Makefile.PL`/`cpanfile` actually changed (e.g. a version bump).
+
 **Build tarball:**
 ```sh
 dzil build
@@ -103,7 +109,7 @@ dzil release          # interactive terminal only — prompts y/n
 cpan-upload Crypt-OpenSSL-PKCS12-<VERSION>.tar.gz   # non-interactive alternative
 ```
 
-**Trial release** (e.g. to solicit CPAN Testers coverage before committing to stable): `dzil release --trial` uploads as `Crypt-OpenSSL-PKCS12-<VERSION>-TRIAL.tar.gz` — PAUSE indexes it as non-default without needing an underscore in `$VERSION`. Tag normally (`v<VERSION>`, no `-TRIAL` suffix) so the same commit can later be promoted to a real release with no changes.
+**Trial release** (e.g. to solicit CPAN Testers coverage before committing to stable): `dzil release --trial` uploads as `Crypt-OpenSSL-PKCS12-<VERSION>-TRIAL.tar.gz` — PAUSE indexes it as non-default without needing an underscore in `$VERSION`. Tag normally (`v<VERSION>`, no `-TRIAL` suffix) so the same commit can later be promoted to a real release with no changes. The 1.99-TRIAL release was actually tagged `v1.99-TRIAL` — double-check the tag name at trial time; promoting later means creating a *second*, differently-named tag (`v<VERSION>`) on the same commit.
 
 **GitHub release** (use `--notes`, not `--body`):
 ```sh
