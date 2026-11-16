@@ -11,8 +11,17 @@ use ExtUtils::MakeMaker;
 use Config;
 use Crypt::OpenSSL::Guess qw(openssl_lib_paths openssl_inc_paths);
 
+my $libs = ' -lssl -lcrypto';
+
+# OpenSSL's static libcrypto on Windows (e.g. MSYS2 MinGW, OpenSSL 4.x) uses
+# CryptoAPI certificate-store functions and BCryptGenRandom, which Perl's own
+# link libraries do not include.
+if ($^O eq 'MSWin32') {
+  $libs = $libs . ' -lcrypt32 -lbcrypt';
+}
+
 my %args = (
-  LIBS => [openssl_lib_paths().' -lssl -lcrypto'],
+  LIBS => [openssl_lib_paths(). $libs],
   INC => openssl_inc_paths(),
 );
 
