@@ -18,8 +18,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # MSYS's own Perl (osname=cygwin, POSIX layer, GNU make, shared OpenSSL).
   perl:
-    name: Perl (msys2-mingw)
+    name: Perl (msys2, msys perl)
     runs-on: windows-latest
 
     strategy:
@@ -66,3 +67,59 @@ jobs:
       - name: Run Tests
         run: |
           make test TEST_VERBOSE=1
+
+  # Native MinGW-w64 Perl (osname=MSWin32). Its Makefile targets mingw32-make:
+  # plain `make` here spawns an empty cmd.exe per recipe line and exits 0
+  # without building anything (see dsully/perl-crypt-openssl-x509#153).
+  mingw64:
+    name: Perl (msys2, mingw64 perl)
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+        shell: powershell
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up msys2
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-perl
+            msys/libcrypt-devel
+            msys/openssl-devel
+      - name: perl -V
+        run: |
+          perl -V
+          perl -V:osname
+          perl -V:make
+      - name: Install Dependencies
+        run: |
+          curl -Uri https://cpanmin.us/ | perl - -nq --with-configure --with-develop --installdeps -v .
+      - name: Build Module
+        run: |
+          perl Makefile.PL
+          mingw32-make
+          # Guard against a silent no-op build passing the job.
+          test -f blib/arch/auto/Crypt/OpenSSL/PKCS12/PKCS12.dll
+      - name: Run Tests
+        run: |
+          mingw32-make test TEST_VERBOSE=1
